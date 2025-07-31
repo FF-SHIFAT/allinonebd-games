@@ -41,8 +41,9 @@
             min-height: 50px;
         }
         #game-board {
-            border-radius: 8px;
-            background-color: #2d3748; /* Dark background for 3D effect */
+            border: 5px solid #4a5568;
+            background-color: #9ab29a; /* Nokia screen color */
+            image-rendering: pixelated;
         }
         .game-list-item {
             cursor: pointer;
@@ -106,8 +107,8 @@
                         <div class="flex items-center space-x-4">
                             <i class="ph-snake-bold text-5xl text-gray-700"></i>
                             <div>
-                                <h3 class="text-xl font-bold">3D Snake Classic</h3>
-                                <p class="text-gray-600">The classic and addictive snake game with a new look!</p>
+                                <h3 class="text-xl font-bold">Nokia Snake '97</h3>
+                                <p class="text-gray-600">The classic and addictive snake game. Get the highest score!</p>
                             </div>
                         </div>
                     </div>
@@ -137,13 +138,9 @@
                     <div id="right-btn" class="ctrl-btn"><i class="ph-arrow-right-bold"></i></div>
                     <div id="down-btn" class="ctrl-btn"><i class="ph-arrow-down-bold"></i></div>
                 </div>
-                 <div id="game-over-screen" class="hidden mt-6">
-                    <p class="text-3xl font-bold text-red-600">Game Over!</p>
-                    <p class="text-xl mt-1">Your Final Score: <span id="final-score">0</span></p>
-                    <div class="mt-4 space-y-3">
-                        <button id="restart-btn" class="w-full max-w-xs bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
-                        <button id="revive-ad-btn" class="w-full max-w-xs bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
-                    </div>
+                 <div id="game-over-buttons" class="hidden mt-6 space-y-3">
+                    <button id="restart-btn" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
+                    <button id="revive-ad-btn" class="w-full max-w-xs mx-auto bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
                 </div>
             </div>
         </div>
@@ -170,51 +167,22 @@
             gameSelectionScreen.classList.remove('hidden');
         });
 
-        // --- Snake Game Logic (New 3D Style) ---
+        // --- Nokia Snake Game Logic ---
         const canvas = document.getElementById('game-board');
         const context = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
-        const finalScoreEl = document.getElementById('final-score');
-        const gameOverScreen = document.getElementById('game-over-screen');
+        const gameOverButtons = document.getElementById('game-over-buttons');
         const restartBtn = document.getElementById('restart-btn');
         
-        const TILE_SIZE = 20;
-        const TILE_COUNT = canvas.width / TILE_SIZE;
-        let snake, food, direction, score, gameOver, gameLoop;
+        const TILE_SIZE = 10;
+        const BOARD_SIZE = canvas.width / TILE_SIZE;
 
-        // Helper function to draw a 3D-like block
-        function drawBlock(x, y, color) {
-            const darkColor = shadeColor(color, -20);
-            context.fillStyle = darkColor;
-            // Draw shadow/depth
-            context.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            
-            context.fillStyle = color;
-            // Draw top face
-            context.fillRect(x * TILE_SIZE + 1, y * TILE_SIZE + 1, TILE_SIZE - 2, TILE_SIZE - 2);
-        }
-        
-        // Helper function to lighten/darken a color
-        function shadeColor(color, percent) {
-            let R = parseInt(color.substring(1, 3), 16);
-            let G = parseInt(color.substring(3, 5), 16);
-            let B = parseInt(color.substring(5, 7), 16);
-            R = parseInt(R * (100 + percent) / 100);
-            G = parseInt(G * (100 + percent) / 100);
-            B = parseInt(B * (100 + percent) / 100);
-            R = (R < 255) ? R : 255;
-            G = (G < 255) ? G : 255;
-            B = (B < 255) ? B : 255;
-            const RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-            const GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-            const BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-            return "#" + RR + GG + BB;
-        }
+        let snake, food, direction, score, gameOver, gameLoop;
 
         function placeFood() {
             food = {
-                x: Math.floor(Math.random() * TILE_COUNT),
-                y: Math.floor(Math.random() * TILE_COUNT)
+                x: Math.floor(Math.random() * BOARD_SIZE),
+                y: Math.floor(Math.random() * BOARD_SIZE)
             };
             for (let segment of snake) {
                 if (segment.x === food.x && segment.y === food.y) {
@@ -224,26 +192,63 @@
         }
 
         function draw() {
-            context.fillStyle = '#2d3748'; // Dark background
+            // Draw board
+            context.fillStyle = '#9ab29a';
             context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw food (dot)
+            context.fillStyle = '#2d3748';
+            context.beginPath();
+            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 3, 0, 2 * Math.PI);
+            context.fill();
             
-            drawBlock(food.x, food.y, '#ef4444'); // Red food
+            // Draw snake
             snake.forEach((segment, index) => {
-                const color = index === 0 ? '#10b981' : '#34d399'; // Green snake, darker head
-                drawBlock(segment.x, segment.y, color);
+                context.fillStyle = '#2d3748'; // Single color for snake
+                context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             });
         }
 
+        function showGameOver() {
+            context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            context.fillStyle = 'white';
+            context.font = 'bold 32px Inter, sans-serif';
+            context.textAlign = 'center';
+            context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 20);
+            
+            context.font = '20px Inter, sans-serif';
+            context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+
+            gameOverButtons.classList.remove('hidden');
+        }
+
         function update() {
-            if (gameOver) {
+            if (gameOver) return;
+
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            
+            // Wall collision
+            if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
+                gameOver = true;
                 clearInterval(gameLoop);
-                gameOverScreen.classList.remove('hidden');
-                finalScoreEl.innerText = score;
+                showGameOver();
                 sendScoreToServer(score);
                 return;
             }
+            
+            // Self collision
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver = true;
+                    clearInterval(gameLoop);
+                    showGameOver();
+                    sendScoreToServer(score);
+                    return;
+                }
+            }
 
-            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
             snake.unshift(head);
 
             if (head.x === food.x && head.y === food.y) {
@@ -252,16 +257,6 @@
                 placeFood();
             } else {
                 snake.pop();
-            }
-
-            if (head.x < 0 || head.x >= TILE_COUNT || head.y < 0 || head.y >= TILE_COUNT) {
-                gameOver = true;
-            }
-            for (let i = 1; i < snake.length; i++) {
-                if (head.x === snake[i].x && head.y === snake[i].y) {
-                    gameOver = true;
-                    break;
-                }
             }
             draw();
         }
@@ -291,7 +286,7 @@
             score = 0;
             gameOver = false;
             scoreEl.innerText = score;
-            gameOverScreen.classList.add('hidden');
+            gameOverButtons.classList.add('hidden');
             placeFood();
             if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, 120);
@@ -309,7 +304,6 @@
         document.getElementById('revive-ad-btn').addEventListener('click', () => {
             alert('Rewarded Ad feature will be added in the next step!');
         });
-
     </script>
 
 </body>
