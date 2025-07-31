@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Allinonebd - Game Zone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,12 +13,12 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #e5e7eb;
-            touch-action: none;
+            touch-action: none; /* মোবাইলে স্ক্রল হওয়া বন্ধ করবে */
         }
         .game-container {
             width: 100%;
-            max-width: 900px; /* কন্টেইনার বড় করা হলো */
-            margin: 1rem auto;
+            max-width: 900px;
+            margin: 0.5rem auto;
         }
         .main-game-box {
             background-color: white;
@@ -26,7 +26,7 @@
             border-radius: 0.75rem;
             padding: 1.5rem;
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            min-height: 500px; /* একটি মিনিমাম উচ্চতা দেওয়া হলো */
+            min-height: 550px;
         }
         .ad-placeholder {
             background-color: #d1d5db;
@@ -40,10 +40,11 @@
             font-weight: 500;
             min-height: 50px;
         }
+        /* ★★★ Nokia স্টাইলের জন্য নতুন CSS ★★★ */
         #game-board {
-            border: 5px solid #374151;
-            border-radius: 8px;
-            background-color: #9ae6b4; /* হালকা সবুজ ব্যাকগ্রাউন্ড */
+            border: 5px solid #4a5568; /* Darker border */
+            background-color: #c7d8c6; /* Classic green background */
+            image-rendering: pixelated; /* Sharp pixels */
         }
         .game-list-item {
             cursor: pointer;
@@ -52,6 +53,32 @@
         .game-list-item:hover {
             transform: translateY(-5px);
         }
+        /* ★★★ মোবাইল কন্ট্রোলের জন্য নতুন CSS ★★★ */
+        #controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 200px;
+            margin: 1rem auto 0;
+        }
+        .ctrl-btn {
+            background-color: #4a5568;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        #up-btn { grid-column: 2 / 3; }
+        #left-btn { grid-column: 1 / 2; grid-row: 2 / 3; }
+        #right-btn { grid-column: 3 / 4; grid-row: 2 / 3; }
+        #down-btn { grid-column: 2 / 3; grid-row: 3 / 4; }
     </style>
 </head>
 <body class="p-2 md:p-4">
@@ -75,16 +102,16 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div id="select-snake-game" class="game-list-item bg-gray-50 p-4 rounded-lg shadow hover:shadow-lg border-2 border-transparent hover:border-indigo-500">
                         <div class="flex items-center space-x-4">
-                            <i class="ph-snake-bold text-5xl text-green-600"></i>
+                            <i class="ph-snake-bold text-5xl text-gray-700"></i>
                             <div>
-                                <h3 class="text-xl font-bold">Classic Snake</h3>
-                                <p class="text-gray-600">Eat the food, grow your snake, and get the highest score!</p>
+                                <h3 class="text-xl font-bold">Nokia Snake '97</h3>
+                                <p class="text-gray-600">The classic and addictive snake game. Get the highest score!</p>
                             </div>
                         </div>
                     </div>
                     <div class="game-list-item bg-gray-100 p-4 rounded-lg shadow border-2 border-transparent cursor-not-allowed opacity-50">
                          <div class="flex items-center space-x-4">
-                            <i class="ph-bird-bold text-5xl text-blue-500"></i>
+                            <i class="ph-bird-bold text-5xl text-gray-700"></i>
                             <div>
                                 <h3 class="text-xl font-bold">Flappy Bird (Coming Soon)</h3>
                                 <p class="text-gray-600">Tap to fly and avoid the pipes!</p>
@@ -96,11 +123,16 @@
 
             <div id="game-area" class="hidden text-center">
                 <div class="flex justify-between items-center mb-4 px-2">
-                    <h2 id="game-title" class="text-2xl font-bold">Snake Game</h2>
-                    <div class="text-lg font-bold bg-gray-200 px-4 py-2 rounded-lg">Score: <span id="score">0</span></div>
+                    <button id="back-to-list-btn" class="text-sm bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300">← Game List</button>
+                    <div class="text-lg font-bold bg-gray-800 text-white px-4 py-2 rounded-md">SCORE: <span id="score">0</span></div>
                 </div>
                 <div class="flex justify-center">
-                    <canvas id="game-board" width="400" height="400"></canvas>
+                    <canvas id="game-board" width="320" height="320"></canvas>
+                </div>
+                <div id="controls" class="md:hidden"> <div id="up-btn" class="ctrl-btn"><i class="ph-arrow-up-bold"></i></div>
+                    <div id="left-btn" class="ctrl-btn"><i class="ph-arrow-left-bold"></i></div>
+                    <div id="right-btn" class="ctrl-btn"><i class="ph-arrow-right-bold"></i></div>
+                    <div id="down-btn" class="ctrl-btn"><i class="ph-arrow-down-bold"></i></div>
                 </div>
                  <div id="game-over-screen" class="hidden mt-6">
                     <p class="text-3xl font-bold text-red-600">Game Over!</p>
@@ -108,7 +140,6 @@
                     <div class="mt-4 space-y-3">
                         <button id="restart-btn" class="w-full max-w-xs bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
                         <button id="revive-ad-btn" class="w-full max-w-xs bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
-                        <button id="back-to-list-btn" class="text-sm text-gray-500 hover:underline mt-2">Back to Game List</button>
                     </div>
                 </div>
             </div>
@@ -131,6 +162,7 @@
         });
 
         document.getElementById('back-to-list-btn').addEventListener('click', () => {
+            if (gameLoop) clearInterval(gameLoop);
             gameArea.classList.add('hidden');
             gameSelectionScreen.classList.remove('hidden');
         });
@@ -143,8 +175,8 @@
         const gameOverScreen = document.getElementById('game-over-screen');
         const restartBtn = document.getElementById('restart-btn');
         
-        const TILE_SIZE = 20;
-        const BOARD_SIZE = board.width / TILE_SIZE; // Assumes a square board
+        const TILE_SIZE = 10; // পিক্সেল ছোট করা হলো
+        const BOARD_SIZE = board.width / TILE_SIZE;
 
         let snake, food, direction, score, gameOver, gameLoop;
 
@@ -155,29 +187,18 @@
             };
             for (let segment of snake) {
                 if (segment.x === food.x && segment.y === food.y) {
-                    placeFood(); // Recursively find a new spot
-                    return;
+                    return placeFood();
                 }
             }
         }
 
         function draw() {
-            // Draw board background
-            context.fillStyle = '#a7d3a1'; // Nokia-like green
+            context.fillStyle = '#c7d8c6';
             context.fillRect(0, 0, board.width, board.height);
-
-            // Draw food (apple)
-            context.fillStyle = '#e54444'; // Red for food
-            context.beginPath();
-            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2.5, 0, 2 * Math.PI);
-            context.fill();
-            
-            // Draw snake
-            snake.forEach((segment, index) => {
-                context.fillStyle = index === 0 ? '#276749' : '#38a169'; // Darker head
+            context.fillStyle = '#333';
+            context.fillRect(food.x * TILE_SIZE, food.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            snake.forEach((segment) => {
                 context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                context.strokeStyle = '#a7d3a1'; // Border color same as background
-                context.strokeRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             });
         }
 
@@ -186,7 +207,7 @@
                 clearInterval(gameLoop);
                 gameOverScreen.classList.remove('hidden');
                 finalScoreEl.innerText = score;
-                // Next step: Send score to the server here
+                sendScoreToServer(score); // পরবর্তী ধাপের জন্য প্রস্তুত
                 return;
             }
 
@@ -201,7 +222,6 @@
                 snake.pop();
             }
 
-            // Wall and self collision
             if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
                 gameOver = true;
             }
@@ -211,16 +231,29 @@
                     break;
                 }
             }
-            
             draw();
         }
+        
+        function changeDirection(dx, dy) {
+            // Prevent the snake from reversing on itself
+            if (snake.length > 1 && direction.x === -dx && direction.y === -dy) {
+                return;
+            }
+            direction = { x: dx, y: dy };
+        }
 
-        function changeDirection(e) {
-            const key = e.key;
-            if ((key === 'ArrowUp' || key.toLowerCase() === 'w') && direction.y === 0) direction = { x: 0, y: -1 };
-            else if ((key === 'ArrowDown' || key.toLowerCase() === 's') && direction.y === 0) direction = { x: 0, y: 1 };
-            else if ((key === 'ArrowLeft' || key.toLowerCase() === 'a') && direction.x === 0) direction = { x: -1, y: 0 };
-            else if ((key === 'ArrowRight' || key.toLowerCase() === 'd') && direction.x === 0) direction = { x: 1, y: 0 };
+        function setupControls() {
+            document.addEventListener('keydown', e => {
+                if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') changeDirection(0, -1);
+                else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') changeDirection(0, 1);
+                else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') changeDirection(-1, 0);
+                else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') changeDirection(1, 0);
+            });
+
+            document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
+            document.getElementById('down-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, 1); });
+            document.getElementById('left-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(-1, 0); });
+            document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(1, 0); });
         }
         
         function startGame() {
@@ -230,18 +263,22 @@
             gameOver = false;
             scoreEl.innerText = score;
             gameOverScreen.classList.add('hidden');
-            
             placeFood();
-            
             if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, 120); // Slightly faster game speed
+            gameLoop = setInterval(update, 150);
         }
 
-        // Event Listeners
-        restartBtn.addEventListener('click', startGame);
-        document.addEventListener('keydown', changeDirection);
+        async function sendScoreToServer(finalScore) {
+            console.log(`Sending score to server: ${finalScore}`);
+            // এখানে আমরা পরবর্তী ধাপে PythonAnywhere সার্ভারে স্কোর পাঠানোর জন্য
+            // fetch() ব্যবহার করে API কল করার কোড লিখব।
+            // আপাতত, এটি শুধু কনসোলে দেখাবে।
+        }
 
-        // Placeholder for ad revive
+        // Initialize Controls
+        setupControls();
+        restartBtn.addEventListener('click', startGame);
+
         document.getElementById('revive-ad-btn').addEventListener('click', () => {
             alert('Rewarded Ad feature will be added in the next step!');
         });
