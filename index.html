@@ -42,8 +42,7 @@
         }
         #game-board {
             border: 5px solid #4a5568;
-            background-color: #9ab29a; /* Nokia screen color */
-            image-rendering: pixelated;
+            background-color: #2d3748;
         }
         .game-list-item {
             cursor: pointer;
@@ -91,10 +90,10 @@
              </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-4">
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-১" target="_blank" class="p-3 bg-green-500 text-white font-bold rounded-lg shadow-md">🎁 Claim Bonus</a>
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-২" target="_blank" class="p-3 bg-blue-500 text-white font-bold rounded-lg shadow-md">▶️ Play & Win</a>
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-৩" target="_blank" class="p-3 bg-yellow-500 text-white font-bold rounded-lg shadow-md">💎 Get Reward</a>
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-৪" target="_blank" class="p-3 bg-red-500 text-white font-bold rounded-lg shadow-md">⚡ Instant Win</a>
+            <a href="your-direct-link-1" target="_blank" class="p-3 bg-green-500 text-white font-bold rounded-lg shadow-md">🎁 Claim Bonus</a>
+            <a href="your-direct-link-2" target="_blank" class="p-3 bg-blue-500 text-white font-bold rounded-lg shadow-md">▶️ Play & Win</a>
+            <a href="your-direct-link-3" target="_blank" class="p-3 bg-yellow-500 text-white font-bold rounded-lg shadow-md">💎 Get Reward</a>
+            <a href="your-direct-link-4" target="_blank" class="p-3 bg-red-500 text-white font-bold rounded-lg shadow-md">⚡ Instant Win</a>
         </div>
 
         <div class="main-game-box">
@@ -107,8 +106,8 @@
                         <div class="flex items-center space-x-4">
                             <i class="ph-snake-bold text-5xl text-gray-700"></i>
                             <div>
-                                <h3 class="text-xl font-bold">Nokia Snake '97</h3>
-                                <p class="text-gray-600">The classic and addictive snake game. Get the highest score!</p>
+                                <h3 class="text-xl font-bold">Colorful Snake</h3>
+                                <p class="text-gray-600">The classic snake game with a new colorful look!</p>
                             </div>
                         </div>
                     </div>
@@ -167,14 +166,14 @@
             gameSelectionScreen.classList.remove('hidden');
         });
 
-        // --- Nokia Snake Game Logic ---
+        // --- Snake Game Logic (Colorful & Thick Head) ---
         const canvas = document.getElementById('game-board');
         const context = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
         const gameOverButtons = document.getElementById('game-over-buttons');
         const restartBtn = document.getElementById('restart-btn');
         
-        const TILE_SIZE = 10;
+        const TILE_SIZE = 16; // Made the snake/food larger
         const BOARD_SIZE = canvas.width / TILE_SIZE;
 
         let snake, food, direction, score, gameOver, gameLoop;
@@ -192,33 +191,41 @@
         }
 
         function draw() {
-            // Draw board
-            context.fillStyle = '#9ab29a';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw food (dot)
             context.fillStyle = '#2d3748';
-            context.beginPath();
-            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 3, 0, 2 * Math.PI);
-            context.fill();
+            context.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw snake
+            // Draw colorful food (apple) with a 3D effect
+            context.fillStyle = '#e53e3e'; // Bright red
+            context.beginPath();
+            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, 2 * Math.PI);
+            context.fill();
+            context.fillStyle = '#fed7d7'; // Light red highlight
+            context.beginPath();
+            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2 - 2, food.y * TILE_SIZE + TILE_SIZE / 2 - 2, TILE_SIZE / 5, 0, 2 * Math.PI);
+            context.fill();
+
+            // Draw snake with a thicker head
             snake.forEach((segment, index) => {
-                context.fillStyle = '#2d3748'; // Single color for snake
-                context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                if (index === 0) { // Head
+                    context.fillStyle = '#38a169'; // Bright green head
+                    context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                } else { // Body
+                    context.fillStyle = '#48bb78'; // Lighter green body
+                    context.fillRect(segment.x * TILE_SIZE + 2, segment.y * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                }
             });
         }
 
         function showGameOver() {
-            context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            context.fillStyle = 'rgba(0, 0, 0, 0.7)';
             context.fillRect(0, 0, canvas.width, canvas.height);
             
             context.fillStyle = 'white';
-            context.font = 'bold 32px Inter, sans-serif';
+            context.font = 'bold 36px Inter, sans-serif';
             context.textAlign = 'center';
             context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 20);
             
-            context.font = '20px Inter, sans-serif';
+            context.font = '24px Inter, sans-serif';
             context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
 
             gameOverButtons.classList.remove('hidden');
@@ -229,7 +236,6 @@
 
             const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
             
-            // Wall collision
             if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
                 gameOver = true;
                 clearInterval(gameLoop);
@@ -238,7 +244,6 @@
                 return;
             }
             
-            // Self collision
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     gameOver = true;
@@ -294,7 +299,7 @@
 
         async function sendScoreToServer(finalScore) {
             console.log(`Sending score to server: ${finalScore}`);
-            // পরবর্তী ধাপে আমরা এখানে PythonAnywhere সার্ভারে স্কোর পাঠানোর কোড লিখব।
+            // We will write the code to send the score to the PythonAnywhere server in the next step.
         }
 
         // Initialize Controls
@@ -304,6 +309,7 @@
         document.getElementById('revive-ad-btn').addEventListener('click', () => {
             alert('Rewarded Ad feature will be added in the next step!');
         });
+
     </script>
 
 </body>
