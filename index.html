@@ -344,6 +344,8 @@
         
         const TILE_SIZE = 16;
         const BOARD_SIZE = 20;
+        
+        // Variables needed globally for game loop
         let snake, food, direction, score, gameOver, gameLoop;
         // --- End Game Elements References ---
 
@@ -628,19 +630,21 @@
 
         // --- Event Listeners and Initialization ---
         
-        // FIX: Reinstating the click handler for selecting the game (Moved to the end)
         document.addEventListener('DOMContentLoaded', () => {
             loadScoreData();
             setupControls();
             setBodyScroll(true);
 
+            // *******************************************************************
+            // FIX: Game Selection and Difficulty Handlers are now inside DOMContentLoaded
+            // *******************************************************************
             selectSnakeGameBtn.addEventListener('click', () => {
                 gameSelectionScreen.classList.add('hidden');
                 gameStartScreen.classList.remove('hidden');
                 setBodyScroll(true); 
             });
 
-            // Difficulty Button Handlers
+            // Difficulty Button Handlers (FIXED)
             document.getElementById('easy-mode-btn').addEventListener('click', (e) => {
                 selectedSpeed = parseInt(e.currentTarget.dataset.speed);
                 startGame(selectedSpeed);
@@ -654,14 +658,14 @@
                 startGame(selectedSpeed);
             });
             
-            // Restart Button
-            restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
-
             // Back to Selection Button
-            backToSelectionBtn.addEventListener('click', () => {
+            document.getElementById('back-to-selection-btn').addEventListener('click', () => {
                 gameStartScreen.classList.add('hidden');
                 gameSelectionScreen.classList.remove('hidden');
             });
+            
+            // Restart Button
+            restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
 
             // Back to List Button
             document.getElementById('back-to-list-btn').addEventListener('click', () => {
