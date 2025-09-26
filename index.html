@@ -434,11 +434,6 @@
             const size = Math.min(container.clientWidth, container.clientHeight, 320); 
             canvas.width = size;
             canvas.height = size;
-            // TILE_SIZE is calculated here based on the canvas size and BOARD_SIZE
-            // Note: BOARD_SIZE is assumed to be 20 based on initial code (320/16=20)
-            // A dynamic TILE_SIZE calculation might be needed if canvas size changes.
-            // For now, let's keep it simple:
-            // TILE_SIZE = size / BOARD_SIZE; 
         }
 
         function placeFood() {
@@ -627,7 +622,7 @@
 
         // --- Event Listeners and Initialization ---
         
-        // FIX: Reinstating the click handler for selecting the game (previously missing)
+        // FIX: Reinstating the click handler for selecting the game
         document.getElementById('select-snake-game').addEventListener('click', () => {
             gameSelectionScreen.classList.add('hidden');
             gameStartScreen.classList.remove('hidden');
