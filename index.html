@@ -324,8 +324,8 @@
         const LS_KEY_HIGH_SCORE = 'snakeHighScore';
         const LS_KEY_TOTAL_SCORE = 'totalGameScore';
         const LS_KEY_HISTORY = 'gameHistory';
-
-        // --- Game Elements References ---
+        
+        // --- Game Elements References (Defined globally for accessibility) ---
         const gameSelectionScreen = document.getElementById('game-selection-screen');
         const gameStartScreen = document.getElementById('game-start-screen');
         const gameArea = document.getElementById('game-area');
@@ -348,6 +348,7 @@
         // --- End Game Elements References ---
 
 
+        // --- Core Functions: Load/Save/Render ---
         function loadScoreData() {
             const highScore = parseInt(localStorage.getItem(LS_KEY_HIGH_SCORE) || '0');
             const totalScore = parseInt(localStorage.getItem(LS_KEY_TOTAL_SCORE) || '0');
@@ -362,11 +363,9 @@
         function saveScoreData(newScore) {
             let { highScore, totalScore, history } = loadScoreData();
 
-            // 1. Update Total Score
             totalScore += newScore;
             localStorage.setItem(LS_KEY_TOTAL_SCORE, totalScore);
 
-            // 2. Update High Score
             let isNewHighScore = false;
             if (newScore > highScore) {
                 highScore = newScore;
@@ -374,14 +373,12 @@
                 isNewHighScore = true;
             }
 
-            // 3. Add to History
             const timestamp = new Date().toLocaleString();
             const newRecord = { score: newScore, date: timestamp, game: 'Snake', speed: getSpeedLevel(selectedSpeed) };
-            history.unshift(newRecord); // Add to the beginning
-            if (history.length > 50) history.pop(); // Keep history manageable
+            history.unshift(newRecord); 
+            if (history.length > 50) history.pop(); 
             localStorage.setItem(LS_KEY_HISTORY, JSON.stringify(history));
 
-            // Update UI
             document.getElementById('total-score-display').innerText = totalScore;
             document.getElementById('high-score-display').innerText = highScore;
             renderHistory(history);
@@ -416,8 +413,6 @@
             return 'Unknown';
         }
 
-
-        // --- UI & Game Control Functions ---
         function setBodyScroll(isScrollable) {
             const body = document.body;
             if (isScrollable) {
@@ -434,7 +429,6 @@
                 scrollToggleBtn.classList.add('bg-gray-400');
             }
         }
-
         
         // --- Game Logic Functions ---
         function resizeCanvas() {
@@ -505,12 +499,10 @@
         }
 
         function showGameOver() {
-            // Save score before displaying final message
             const isNewHighScore = saveScoreData(score);
 
             finalScoreDisplay.innerText = `Score: ${score}`;
             
-            // New High Score Notification
             if (isNewHighScore) {
                 gameOverOverlay.querySelector('#game-over-message').innerText = "NEW HIGH SCORE!";
                 finalScoreDisplay.classList.add('text-yellow-600', 'font-bold');
@@ -529,7 +521,6 @@
             lastScore = score;
         }
         
-        // --- রিভাইভ ফাংশন ---
         function reviveGame() {
             gameOver = false;
             gameOverOverlay.classList.add('hidden');
@@ -558,7 +549,6 @@
         function changeDirection(dx, dy) {
             if (snake.length > 1 && direction.x === -dx && direction.y === -dy) return;
             
-            // *** লজিক: যদি গেম থেমে থাকে, তবে প্রথম ইনপুট গেম শুরু করবে ***
             if (direction.x === 0 && direction.y === 0 && !gameOver) {
                 gameLoop = setInterval(update, selectedSpeed); 
             }
@@ -574,18 +564,14 @@
                 'right-btn': [1, 0]
             };
             
-            // Control Button Touch/Click Events (Mouse Click added here)
             Object.keys(controlMap).forEach(id => {
                 const btn = document.getElementById(id);
                 const [dx, dy] = controlMap[id];
 
-                // Touch
                 btn.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(dx, dy); });
-                // Click (Mouse)
                 btn.addEventListener('click', () => { changeDirection(dx, dy); });
             });
 
-            // Desktop Key Controls (copied for completeness)
             document.addEventListener('keydown', e => {
                 if (gameArea.classList.contains('hidden')) return;
                 if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') changeDirection(0, -1);
@@ -594,7 +580,6 @@
                 else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') changeDirection(1, 0);
             });
             
-            // Swiping on Game Board (copied for completeness)
             let touchstartX = 0;
             let touchstartY = 0;
             const gameBoard = document.getElementById('game-board');
@@ -626,6 +611,33 @@
             }, false);
         }
 
+        // --- Global Difficulty Handler (Accessible from inline onclick) ---
+        // Final Fix for Difficulty Buttons: Defines the handler globally.
+        window.handleDifficultySelect = function(element) {
+            const speed = parseInt(element.dataset.speed);
+            selectedSpeed = speed;
+            startGame(selectedSpeed);
+        }
+        
+        function startGame(speed) {
+            const gameSpeed = speed || selectedSpeed; 
+
+            gameStartScreen.classList.add('hidden'); 
+            gameArea.classList.remove('hidden');
+            gameOverOverlay.classList.add('hidden');
+            
+            resizeCanvas(); 
+            snake = [{ x: 10, y: 10 }];
+            direction = { x: 0, y: 0 }; 
+            score = 0;
+            gameOver = false;
+            scoreEl.innerText = score;
+            placeFood();
+            draw(); 
+            
+            if (gameLoop) clearInterval(gameLoop);
+        }
+
         // --- Event Listeners and Initialization ---
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -633,29 +645,11 @@
             setupControls();
             setBodyScroll(true);
 
-            // *******************************************************************
-            // FIX 1: Game Selection Click Handler (Classic Snake)
-            // *******************************************************************
+            // FIX: Game Selection Click Handler (Classic Snake)
             selectSnakeGameBtn.addEventListener('click', () => {
                 gameSelectionScreen.classList.add('hidden');
                 gameStartScreen.classList.remove('hidden');
                 setBodyScroll(true); 
-            });
-
-            // *******************************************************************
-            // FIX 2: Difficulty Button Handlers (FIXED - using event listeners on global elements)
-            // *******************************************************************
-            document.getElementById('easy-mode-btn').addEventListener('click', (e) => {
-                selectedSpeed = parseInt(e.currentTarget.dataset.speed);
-                startGame(selectedSpeed);
-            });
-            document.getElementById('medium-mode-btn').addEventListener('click', (e) => {
-                selectedSpeed = parseInt(e.currentTarget.dataset.speed);
-                startGame(selectedSpeed);
-            });
-            document.getElementById('hard-mode-btn').addEventListener('click', (e) => {
-                selectedSpeed = parseInt(e.currentTarget.dataset.speed);
-                startGame(selectedSpeed);
             });
             
             // Back to Selection Button
@@ -677,9 +671,6 @@
 
 
             // --- "Watch Ad to Continue" লজিক ---
-            const REVIVE_TIME = 20;
-            const SMARTLINK_URL = 'https://www.revenuecpmgate.com/ahzyb351n?key=6286b11048d4571f3a9cfd23abd5158b';
-
             reviveAdBtn.addEventListener('click', () => {
                 const totalTime = REVIVE_TIME;
                 let timeLeft = totalTime;
