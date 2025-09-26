@@ -1,310 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Allinonebd - Game Zone</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #e5e7eb;
-            touch-action: none;
-        }
-        .game-container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0.5rem auto;
-        }
-        .main-game-box {
-            background-color: white;
-            border: 1px solid #d1d5db;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            min-height: 550px;
-        }
-        .ad-placeholder {
-            background-color: #d1d5db;
-            border: 2px dashed #9ca3af;
-            color: #4b5563;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            min-height: 50px;
-        }
-        #game-board {
-            border: 5px solid #4a5568;
-            background-color: #f3f4f6; /* নতুন হালকা ধূসর ব্যাকগ্রাউন্ড */
-            image-rendering: pixelated;
-        }
-        .game-list-item {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .game-list-item:hover {
-            transform: translateY(-5px);
-        }
-        #controls {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 200px;
-            margin: 1rem auto 0;
-        }
-        .ctrl-btn {
-            background-color: #4a5568;
-            color: white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            user-select: none;
-            box-shadow: 0 4px #2d3748;
-        }
-        .ctrl-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px #2d3748;
-        }
-        #up-btn { grid-column: 2 / 3; }
-        #left-btn { grid-column: 1 / 2; grid-row: 2 / 3; }
-        #right-btn { grid-column: 3 / 4; grid-row: 2 / 3; }
-        #down-btn { grid-column: 2 / 3; grid-row: 3 / 4; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Allinonebd - Game Zone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+            /* touch-action: none; এই লাইনটি অপসারণ করা হলো যাতে মোবাইলে স্ক্রল করা যায় */
+            /* মোবাইলে পুরো কন্টেন্ট দেখানোর জন্য নতুন পরিবর্তন: */
+            min-height: 100vh; /* Viewport এর সম্পূর্ণ উচ্চতা */
+            overflow-y: auto; /* প্রয়োজনে স্ক্রলবার দেখাবে */
+        }
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0.5rem auto;
+            /* বক্সের উচ্চতা কিছুটা কমানো হলো যাতে বাকি উপাদানগুলি ফিট হয় */
+            padding-bottom: 2rem; 
+        }
+        .main-game-box {
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            /* min-height: 550px; এই লাইনটি অপসারণ করা হলো যাতে উচ্চতা কন্টেন্ট অনুযায়ী সেট হয় */
+        }
+        .ad-placeholder {
+            background-color: #d1d5db;
+            border: 2px dashed #9ca3af;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            min-height: 50px;
+        }
+        #game-board {
+            border: 5px solid #4a5568;
+            background-color: #f3f4f6; /* নতুন হালকা ধূসর ব্যাকগ্রাউন্ড */
+            image-rendering: pixelated;
+            /* গেম বোর্ডকে মোবাইলে ছোট করার জন্য সর্বোচ্চ প্রস্থ এবং উচ্চতা ঠিক করা হলো */
+            max-width: 300px; 
+            max-height: 300px;
+            width: 100%; /* কন্টেইনারের প্রস্থের সাথে মানিয়ে নেবে */
+            height: 100%; /* কন্টেইনারের উচ্চতার সাথে মানিয়ে নেবে */
+        }
+        .game-list-item {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .game-list-item:hover {
+            transform: translateY(-5px);
+        }
+        #controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 200px;
+            margin: 1rem auto 0;
+            /* এটি যেন স্ক্রিনের নিচে ভালোভাবে ফিট করে তার জন্য আরো উপরে নিয়ে আসা হলো */
+            margin-top: 1.5rem;
+        }
+        .ctrl-btn {
+            background-color: #4a5568;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px #2d3748;
+        }
+        .ctrl-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px #2d3748;
+        }
+        #up-btn { grid-column: 2 / 3; }
+        #left-btn { grid-column: 1 / 2; grid-row: 2 / 3; }
+        #right-btn { grid-column: 3 / 4; grid-row: 2 / 3; }
+        #down-btn { grid-column: 2 / 3; grid-row: 3 / 4; }
+    </style>
 </head>
 <body class="p-2 md:p-4">
 
-    <div class="game-container">
-        <div class="ad-placeholder h-24 mb-4">
-             </div>
+    <div class="game-container">
+        <div class="ad-placeholder h-24 mb-4">
+             </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-4">
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-১" target="_blank" class="p-3 bg-green-500 text-white font-bold rounded-lg shadow-md">🎁 Claim Bonus</a>
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-২" target="_blank" class="p-3 bg-blue-500 text-white font-bold rounded-lg shadow-md">▶️ Play & Win</a>
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-৩" target="_blank" class="p-3 bg-yellow-500 text-white font-bold rounded-lg shadow-md">💎 Get Reward</a>
-            <a href="আপনার-ডিরেক্ট-লিঙ্ক-৪" target="_blank" class="p-3 bg-red-500 text-white font-bold rounded-lg shadow-md">⚡ Instant Win</a>
-        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-4">
+            <a href="আপনার-ডিরেক্ট-লিঙ্ক-১" target="_blank" class="p-3 bg-green-500 text-white font-bold rounded-lg shadow-md">🎁 Claim Bonus</a>
+            <a href="আপনার-ডিরেক্ট-লিঙ্ক-২" target="_blank" class="p-3 bg-blue-500 text-white font-bold rounded-lg shadow-md">▶️ Play & Win</a>
+            <a href="আপনার-ডিরেক্ট-লিঙ্ক-৩" target="_blank" class="p-3 bg-yellow-500 text-white font-bold rounded-lg shadow-md">💎 Get Reward</a>
+            <a href="আপনার-ডিরেক্ট-লিঙ্ক-৪" target="_blank" class="p-3 bg-red-500 text-white font-bold rounded-lg shadow-md">⚡ Instant Win</a>
+        </div>
 
-        <div class="main-game-box">
-            <div id="game-selection-screen">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2 text-center">Choose a Game</h1>
-                <p class="text-center text-gray-500 mb-6">Select a game from the list below to start earning points!</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div id="select-snake-game" class="game-list-item bg-gray-50 p-4 rounded-lg shadow hover:shadow-lg border-2 border-transparent hover:border-indigo-500">
-                        <div class="flex items-center space-x-4">
-                            <i class="ph-snake-bold text-5xl text-gray-700"></i>
-                            <div>
-                                <h3 class="text-xl font-bold">Classic Snake</h3>
-                                <p class="text-gray-600">The classic and addictive snake game with a new look!</p>
-                            </div>
-                        </div>
+        <div class="main-game-box">
+            <div id="game-selection-screen">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2 text-center">Choose a Game</h1>
+                <p class="text-center text-gray-500 mb-6">Select a game from the list below to start earning points!</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="select-snake-game" class="game-list-item bg-gray-50 p-4 rounded-lg shadow hover:shadow-lg border-2 border-transparent hover:border-indigo-500">
+                        <div class="flex items-center space-x-4">
+                            <i class="ph-snake-bold text-5xl text-gray-700"></i>
+                            <div>
+                                <h3 class="text-xl font-bold">Classic Snake</h3>
+                                <p class="text-gray-600">The classic and addictive snake game with a new look!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-list-item bg-gray-100 p-4 rounded-lg shadow border-2 border-transparent cursor-not-allowed opacity-50">
+                         <div class="flex items-center space-x-4">
+                            <i class="ph-bird-bold text-5xl text-gray-700"></i>
+                            <div>
+                                <h3 class="text-xl font-bold">Flappy Bird (Coming Soon)</h3>
+                                <p class="text-gray-600">Tap to fly and avoid the pipes!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-area" class="hidden text-center">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <button id="back-to-list-btn" class="text-sm bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300">← Game List</button>
+                    <div class="text-lg font-bold bg-gray-800 text-white px-4 py-2 rounded-md">SCORE: <span id="score">0</span></div>
+                </div>
+                <div class="flex justify-center">
+                    <div id="canvas-container" class="relative w-full max-w-xs aspect-square mx-auto">
+                        <canvas id="game-board" width="320" height="320"></canvas>
                     </div>
-                    <div class="game-list-item bg-gray-100 p-4 rounded-lg shadow border-2 border-transparent cursor-not-allowed opacity-50">
-                         <div class="flex items-center space-x-4">
-                            <i class="ph-bird-bold text-5xl text-gray-700"></i>
-                            <div>
-                                <h3 class="text-xl font-bold">Flappy Bird (Coming Soon)</h3>
-                                <p class="text-gray-600">Tap to fly and avoid the pipes!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </div>
+                                <div id="controls">
+                    <div id="up-btn" class="ctrl-btn"><i class="ph-arrow-up-bold"></i></div>
+                    <div id="left-btn" class="ctrl-btn"><i class="ph-arrow-left-bold"></i></div>
+                    <div id="right-btn" class="ctrl-btn"><i class="ph-arrow-right-bold"></i></div>
+                    <div id="down-btn" class="ctrl-btn"><i class="ph-arrow-down-bold"></i></div>
+                </div>
+                 <div id="game-over-buttons" class="hidden mt-6 space-y-3">
+                    <button id="restart-btn" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
+                    <button id="revive-ad-btn" class="w-full max-w-xs mx-auto bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
+                </div>
+            </div>
+        </div>
 
-            <div id="game-area" class="hidden text-center">
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <button id="back-to-list-btn" class="text-sm bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300">← Game List</button>
-                    <div class="text-lg font-bold bg-gray-800 text-white px-4 py-2 rounded-md">SCORE: <span id="score">0</span></div>
-                </div>
-                <div class="flex justify-center">
-                    <canvas id="game-board" width="320" height="320"></canvas>
-                </div>
-                <div id="controls" class="md:hidden">
-                    <div id="up-btn" class="ctrl-btn"><i class="ph-arrow-up-bold"></i></div>
-                    <div id="left-btn" class="ctrl-btn"><i class="ph-arrow-left-bold"></i></div>
-                    <div id="right-btn" class="ctrl-btn"><i class="ph-arrow-right-bold"></i></div>
-                    <div id="down-btn" class="ctrl-btn"><i class="ph-arrow-down-bold"></i></div>
-                </div>
-                 <div id="game-over-buttons" class="hidden mt-6 space-y-3">
-                    <button id="restart-btn" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
-                    <button id="revive-ad-btn" class="w-full max-w-xs mx-auto bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
-                </div>
-            </div>
-        </div>
+        <div class="ad-placeholder h-24 mt-4">
+             </div>
+    </div>
 
-        <div class="ad-placeholder h-24 mt-4">
-             </div>
-    </div>
+    <script>
+        // --- Game Selection ---
+        const gameSelectionScreen = document.getElementById('game-selection-screen');
+        const gameArea = document.getElementById('game-area');
+        const selectSnakeGameBtn = document.getElementById('select-snake-game');
+        
+        selectSnakeGameBtn.addEventListener('click', () => {
+            gameSelectionScreen.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            // ক্যানভাস সাইজ আপডেট করার জন্য নতুন ফাংশন কল করা হলো
+            resizeCanvas(); 
+            startGame();
+        });
 
-    <script>
-        // --- Game Selection ---
-        const gameSelectionScreen = document.getElementById('game-selection-screen');
-        const gameArea = document.getElementById('game-area');
-        const selectSnakeGameBtn = document.getElementById('select-snake-game');
-        
-        selectSnakeGameBtn.addEventListener('click', () => {
-            gameSelectionScreen.classList.add('hidden');
-            gameArea.classList.remove('hidden');
-            startGame();
+        document.getElementById('back-to-list-btn').addEventListener('click', () => {
+            if (gameLoop) clearInterval(gameLoop);
+            gameArea.classList.add('hidden');
+            gameSelectionScreen.classList.remove('hidden');
+        });
+
+        // --- Snake Game Logic ---
+        const canvas = document.getElementById('game-board');
+        const context = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const gameOverButtons = document.getElementById('game-over-buttons');
+        const restartBtn = document.getElementById('restart-btn');
+        
+        let TILE_SIZE = 16;
+        let BOARD_SIZE = canvas.width / TILE_SIZE;
+
+        let snake, food, direction, score, gameOver, gameLoop;
+
+        // ক্যানভাসের আকার রিসাইজ করার জন্য নতুন ফাংশন
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            // কন্টেইনারের প্রস্থ এবং উচ্চতার সর্বনিম্ন মানটি নেওয়া হলো যাতে এটি একটি বর্গাকার আকার ধারণ করে 
+            const size = Math.min(container.clientWidth, container.clientHeight, 320); 
+            
+            // ক্যানভাসের width এবং height আপডেট করা হলো
+            canvas.width = size;
+            canvas.height = size;
+            
+            // TILE_SIZE আপডেট করা হলো
+            // 320x320 আকারের জন্য TILE_SIZE ছিল 16. এখন নতুন সাইজের জন্য TILE_SIZE 20 দিয়ে ভাগ করে বের করা হলো।
+            // (320 / 16) = 20 টি টাইলস। তাই BOARD_SIZE 20 হতে হবে।
+            BOARD_SIZE = 20;
+            TILE_SIZE = size / BOARD_SIZE;
+
+            if (gameLoop) {
+                // গেম চলন্ত অবস্থায় থাকলে শুধু ড্র কল করা হলো
+                draw();
+            }
+        }
+
+        // স্ক্রিন রিসাইজ হলে ক্যানভাসও যেন রিসাইজ হয়
+        window.addEventListener('resize', () => {
+            if (!gameArea.classList.contains('hidden')) {
+                resizeCanvas();
+            }
         });
 
-        document.getElementById('back-to-list-btn').addEventListener('click', () => {
-            if (gameLoop) clearInterval(gameLoop);
-            gameArea.classList.add('hidden');
-            gameSelectionScreen.classList.remove('hidden');
-        });
+        function placeFood() {
+            food = {
+                x: Math.floor(Math.random() * BOARD_SIZE),
+                y: Math.floor(Math.random() * BOARD_SIZE)
+            };
+            for (let segment of snake) {
+                if (segment.x === food.x && segment.y === food.y) {
+                    return placeFood();
+                }
+            }
+        }
 
-        // --- Snake Game Logic ---
-        const canvas = document.getElementById('game-board');
-        const context = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const gameOverButtons = document.getElementById('game-over-buttons');
-        const restartBtn = document.getElementById('restart-btn');
-        
-        const TILE_SIZE = 16;
-        const BOARD_SIZE = canvas.width / TILE_SIZE;
+        function draw() {
+            context.fillStyle = '#f3f4f6';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            context.fillStyle = '#ef4444'; // Red food
+            context.beginPath();
+            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, 2 * Math.PI);
+            context.fill();
 
-        let snake, food, direction, score, gameOver, gameLoop;
+            snake.forEach((segment, index) => {
+                if (index === 0) { // Head
+                    context.fillStyle = '#10b981'; // Bright green head
+                    context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                } else { // Body
+                    context.fillStyle = '#34d399'; // Lighter green body
+                    context.fillRect(segment.x * TILE_SIZE + 2, segment.y * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                }
+            });
+        }
 
-        function placeFood() {
-            food = {
-                x: Math.floor(Math.random() * BOARD_SIZE),
-                y: Math.floor(Math.random() * BOARD_SIZE)
-            };
-            for (let segment of snake) {
-                if (segment.x === food.x && segment.y === food.y) {
-                    return placeFood();
+        function showGameOver() {
+            context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            context.fillStyle = '#1f2937';
+            context.font = 'bold ' + (canvas.height * 0.1125) + 'px Inter, sans-serif'; // ফন্টের আকার রিসাইজ করা হলো
+            context.textAlign = 'center';
+            context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - (canvas.height * 0.0625)); // পজিশন রিসাইজ করা হলো
+            
+            context.font = (canvas.height * 0.075) + 'px Inter, sans-serif'; // ফন্টের আকার রিসাইজ করা হলো
+            context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + (canvas.height * 0.0625)); // পজিশন রিসাইজ করা হলো
+
+            gameOverButtons.classList.remove('hidden');
+        }
+
+        function update() {
+            if (gameOver) return;
+
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            
+            if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
+                gameOver = true;
+                clearInterval(gameLoop);
+                showGameOver();
+                sendScoreToServer(score);
+                return;
+            }
+            
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver = true;
+                    clearInterval(gameLoop);
+                    showGameOver();
+                    sendScoreToServer(score);
+                    return;
+                }
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreEl.innerText = score;
+                placeFood();
+            } else {
+                snake.pop();
+            }
+            draw();
+        }
+        
+        function changeDirection(dx, dy) {
+            if (snake.length > 1 && direction.x === -dx && direction.y === -dy) return;
+            direction = { x: dx, y: dy };
+        }
+
+        function setupControls() {
+            document.addEventListener('keydown', e => {
+                if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') changeDirection(0, -1);
+                else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') changeDirection(0, 1);
+                else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') changeDirection(-1, 0);
+                else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') changeDirection(1, 0);
+            });
+            
+            // টাচ কন্ট্রোল (Swiping on Game Board) এর জন্য নতুন কোড
+            let touchstartX = 0;
+            let touchstartY = 0;
+            const gameBoard = document.getElementById('game-board');
+
+            gameBoard.addEventListener('touchstart', (e) => {
+                // e.preventDefault(); /* এটি অপসারণ করা হয়েছে যাতে পুরো স্ক্রল কাজ করে */
+                touchstartX = e.changedTouches[0].screenX;
+                touchstartY = e.changedTouches[0].screenY;
+            }, false);
+
+            gameBoard.addEventListener('touchend', (e) => {
+                let touchendX = e.changedTouches[0].screenX;
+                let touchendY = e.changedTouches[0].screenY;
+
+                let dx = touchendX - touchstartX;
+                let dy = touchendY - touchstartY;
+
+                const SWIPE_THRESHOLD = 50; // সোয়াইপ হিসেবে ধরার জন্য ন্যূনতম দূরত্ব
+
+                if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        // Horizontal swipe
+                        if (dx > 0) changeDirection(1, 0); // Right
+                        else changeDirection(-1, 0); // Left
+                    } else {
+                        // Vertical swipe
+                        if (dy > 0) changeDirection(0, 1); // Down
+                        else changeDirection(0, -1); // Up
+                    }
                 }
-            }
-        }
+            }, false);
+            // টাচ কন্ট্রোল শেষ
 
-        function draw() {
-            context.fillStyle = '#f3f4f6';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            
-            context.fillStyle = '#ef4444'; // Red food
-            context.beginPath();
-            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, 2 * Math.PI);
-            context.fill();
+            // কন্ট্রোল বাটন এর জন্য টাচ ইভেন্ট
+            document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
+            document.getElementById('down-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, 1); });
+            document.getElementById('left-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(-1, 0); });
+            document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(1, 0); });
+        }
+        
+        function startGame() {
+            // resizeCanvas কেও কল করা হলো যাতে প্রতিবার নতুন গেম শুরুর আগে সাইজ ঠিক হয় 
+            resizeCanvas(); 
 
-            snake.forEach((segment, index) => {
-                if (index === 0) { // Head
-                    context.fillStyle = '#10b981'; // Bright green head
-                    context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                } else { // Body
-                    context.fillStyle = '#34d399'; // Lighter green body
-                    context.fillRect(segment.x * TILE_SIZE + 2, segment.y * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                }
-            });
-        }
+            snake = [{ x: 10, y: 10 }];
+            direction = { x: 0, y: 0 };
+            score = 0;
+            gameOver = false;
+            scoreEl.innerText = score;
+            gameOverButtons.classList.add('hidden');
+            placeFood();
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, 120);
+        }
 
-        function showGameOver() {
-            context.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            
-            context.fillStyle = '#1f2937';
-            context.font = 'bold 36px Inter, sans-serif';
-            context.textAlign = 'center';
-            context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 20);
-            
-            context.font = '24px Inter, sans-serif';
-            context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+        async function sendScoreToServer(finalScore) {
+            console.log(`Sending score to server: ${finalScore}`);
+            // পরবর্তী ধাপে আমরা এখানে PythonAnywhere সার্ভারে স্কোর পাঠানোর কোড লিখব।
+        }
 
-            gameOverButtons.classList.remove('hidden');
-        }
+        // Initialize Controls
+        setupControls();
+        restartBtn.addEventListener('click', startGame);
 
-        function update() {
-            if (gameOver) return;
-
-            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            
-            if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
-                gameOver = true;
-                clearInterval(gameLoop);
-                showGameOver();
-                sendScoreToServer(score);
-                return;
-            }
-            
-            for (let i = 1; i < snake.length; i++) {
-                if (head.x === snake[i].x && head.y === snake[i].y) {
-                    gameOver = true;
-                    clearInterval(gameLoop);
-                    showGameOver();
-                    sendScoreToServer(score);
-                    return;
-                }
-            }
-
-            snake.unshift(head);
-
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                scoreEl.innerText = score;
-                placeFood();
-            } else {
-                snake.pop();
-            }
-            draw();
-        }
-        
-        function changeDirection(dx, dy) {
-            if (snake.length > 1 && direction.x === -dx && direction.y === -dy) return;
-            direction = { x: dx, y: dy };
-        }
-
-        function setupControls() {
-            document.addEventListener('keydown', e => {
-                if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') changeDirection(0, -1);
-                else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') changeDirection(0, 1);
-                else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') changeDirection(-1, 0);
-                else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') changeDirection(1, 0);
-            });
-
-            document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
-            document.getElementById('down-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, 1); });
-            document.getElementById('left-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(-1, 0); });
-            document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(1, 0); });
-        }
-        
-        function startGame() {
-            snake = [{ x: 10, y: 10 }];
-            direction = { x: 0, y: 0 };
-            score = 0;
-            gameOver = false;
-            scoreEl.innerText = score;
-            gameOverButtons.classList.add('hidden');
-            placeFood();
-            if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, 120);
-        }
-
-        async function sendScoreToServer(finalScore) {
-            console.log(`Sending score to server: ${finalScore}`);
-            // পরবর্তী ধাপে আমরা এখানে PythonAnywhere সার্ভারে স্কোর পাঠানোর কোড লিখব।
-        }
-
-        // Initialize Controls
-        setupControls();
-        restartBtn.addEventListener('click', startGame);
-
-        document.getElementById('revive-ad-btn').addEventListener('click', () => {
-            alert('Rewarded Ad feature will be added in the next step!');
-        });
-    </script>
+        document.getElementById('revive-ad-btn').addEventListener('click', () => {
+            alert('Rewarded Ad feature will be added in the next step!');
+        });
+    </script>
 
 </body>
 </html>
