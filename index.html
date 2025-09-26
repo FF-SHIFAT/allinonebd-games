@@ -254,13 +254,13 @@
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Select Difficulty for Snake</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
-                    <div data-speed="200" class="difficulty-btn bg-green-500 text-white shadow-lg" id="easy-mode-btn">
+                    <div data-speed="200" class="difficulty-btn bg-green-500 text-white shadow-lg" onclick="handleDifficultySelect(this)" id="easy-mode-btn">
                         Easy (Slow)
                     </div>
-                    <div data-speed="120" class="difficulty-btn bg-yellow-500 text-white shadow-lg" id="medium-mode-btn">
+                    <div data-speed="120" class="difficulty-btn bg-yellow-500 text-white shadow-lg" onclick="handleDifficultySelect(this)" id="medium-mode-btn">
                         Medium (Normal)
                     </div>
-                    <div data-speed="80" class="difficulty-btn bg-red-500 text-white shadow-lg" id="hard-mode-btn">
+                    <div data-speed="80" class="difficulty-btn bg-red-500 text-white shadow-lg" onclick="handleDifficultySelect(this)" id="hard-mode-btn">
                         Hard (Fast)
                     </div>
                 </div>
@@ -324,7 +324,7 @@
         const LS_KEY_HIGH_SCORE = 'snakeHighScore';
         const LS_KEY_TOTAL_SCORE = 'totalGameScore';
         const LS_KEY_HISTORY = 'gameHistory';
-        
+
         // --- Game Elements References ---
         const gameSelectionScreen = document.getElementById('game-selection-screen');
         const gameStartScreen = document.getElementById('game-start-screen');
@@ -344,8 +344,6 @@
         
         const TILE_SIZE = 16;
         const BOARD_SIZE = 20;
-        
-        // Variables needed globally for game loop
         let snake, food, direction, score, gameOver, gameLoop;
         // --- End Game Elements References ---
 
@@ -636,7 +634,7 @@
             setBodyScroll(true);
 
             // *******************************************************************
-            // FIX: Game Selection and Difficulty Handlers are now inside DOMContentLoaded
+            // FIX 1: Game Selection Click Handler (Classic Snake)
             // *******************************************************************
             selectSnakeGameBtn.addEventListener('click', () => {
                 gameSelectionScreen.classList.add('hidden');
@@ -644,7 +642,9 @@
                 setBodyScroll(true); 
             });
 
-            // Difficulty Button Handlers (FIXED)
+            // *******************************************************************
+            // FIX 2: Difficulty Button Handlers (FIXED - using event listeners on global elements)
+            // *******************************************************************
             document.getElementById('easy-mode-btn').addEventListener('click', (e) => {
                 selectedSpeed = parseInt(e.currentTarget.dataset.speed);
                 startGame(selectedSpeed);
@@ -659,7 +659,7 @@
             });
             
             // Back to Selection Button
-            document.getElementById('back-to-selection-btn').addEventListener('click', () => {
+            backToSelectionBtn.addEventListener('click', () => {
                 gameStartScreen.classList.add('hidden');
                 gameSelectionScreen.classList.remove('hidden');
             });
