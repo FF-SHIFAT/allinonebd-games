@@ -49,6 +49,15 @@
             align-items: center;
             justify-content: center;
         }
+        /* Media Query for Responsive Ads */
+        @media (min-width: 768px) {
+            .top-ad-slot {
+                min-height: 90px; /* 728x90 এর জন্য */
+            }
+            .bottom-ad-slot {
+                min-height: 50px; /* 320x50 এর জন্য */
+            }
+        }
 
         #game-board {
             border: 5px solid #4a5568;
@@ -180,8 +189,18 @@
 <body class="p-2 md:p-4">
 
     <div class="game-container">
-        <div class="ad-placeholder h-24 mb-4">
-            </div>
+        <div class="ad-placeholder h-24 mb-4 top-ad-slot">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '37af556e68e803f170df4e40b15a5843',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/37af556e68e803f170df4e40b15a5843/invoke.js"></script>
+        </div>
 
         <div class="responsive-buttons text-center mb-4">
             <a href="আপনার-ডিরেক্ট-লিঙ্ক-১" target="_blank" class="p-3 bg-green-500 text-white font-bold rounded-lg shadow-md">🎁 Claim Bonus</a>
@@ -266,8 +285,18 @@
             </div>
         </div>
 
-        <div class="ad-placeholder h-24 mt-4">
-            </div>
+        <div class="ad-placeholder h-24 mt-4 bottom-ad-slot">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '0b2ef9cfd621437503e7b94668e07929',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/0b2ef9cfd621437503e7b94668e07929/invoke.js"></script>
+        </div>
     </div>
 
     <script>
@@ -278,6 +307,9 @@
         let lastSnakeState = [];
         let lastDirection = { x: 0, y: 0 };
         let lastScore = 0;
+        
+        // Smartlink URL
+        const SMARTLINK_URL = 'https://www.revenuecpmgate.com/ahzyb351n?key=6286b11048d4571f3a9cfd23abd5158b';
 
         // --- Utility Functions ---
         function setBodyScroll(isScrollable) {
@@ -419,7 +451,7 @@
             lastScore = score;
         }
         
-        // --- রিভাইভ ফাংশন (আপডেট করা হয়েছে) ---
+        // --- রিভাইভ ফাংশন ---
         function reviveGame() {
             gameOver = false;
             gameOverOverlay.classList.add('hidden');
@@ -433,11 +465,11 @@
                 y: lastHead.y - lastDirection.y 
             };
             
-            // যদি সেফ পজিশন বোর্ডের ভেতরে থাকে, তাহলে সাপকে সেখানে বসানো হলো
+            // যদি সেফ পজিশন বোর্ডের ভেতরে থাকে
             if (safeHead.x >= 0 && safeHead.x < BOARD_SIZE && safeHead.y >= 0 && safeHead.y < BOARD_SIZE) {
                 snake = [safeHead, ...lastSnakeState.slice(0, -1)]; // নতুন মাথা যোগ করে লেজ থেকে একটি সরালাম
             } else {
-                // যদি সেফ পজিশন বোর্ডের বাইরে যায় (যেমন দেওয়ালের ঠিক বাইরে), তবে মাথাকে দেওয়ালের কাছাকাছি আনা হলো
+                // যদি সেফ পজিশন বোর্ডের বাইরে যায়, তাহলে শুধু আগের মাথাতেই বসানো হলো
                 snake = [{ ...lastHead }, ...lastSnakeState.slice(1)];
             }
             
@@ -451,8 +483,7 @@
             placeFood();
             draw(); // একবার ড্র করে সাপকে দেখানো হলো
             
-            // এখানে গেম লুপ শুরু করা হবে না, তা ইউজার ইনপুটের জন্য অপেক্ষা করবে
-            // গেম লুপ শুরু হবে changeDirection ফাংশনে 
+            // গেম লুপ এখানে শুরু হবে না, তা ইউজার ইনপুটের জন্য অপেক্ষা করবে (changeDirection ফাংশনে শুরু হবে)
         }
         // --- রিভাইভ ফাংশন শেষ ---
 
@@ -460,7 +491,7 @@
         function update() {
             if (gameOver) return;
 
-            // যদি direction {x:0, y:0} হয়, তবে সাপ স্থির থাকবে এবং এই ফাংশনটি চলবে না
+            // যদি direction {x:0, y:0} হয়, তবে সাপ স্থির থাকবে
             if (direction.x === 0 && direction.y === 0) {
                 return;
             }
@@ -546,7 +577,7 @@
                 }
             }, false);
 
-            // Control Button Touch/Click Events (Mouse Click and Touch Start both call changeDirection)
+            // Control Button Touch/Click Events
             document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
             document.getElementById('up-btn').addEventListener('click', () => { changeDirection(0, -1); });
 
@@ -574,10 +605,9 @@
             gameOver = false;
             scoreEl.innerText = score;
             placeFood();
-            draw(); // সাপকে শুরুতে এঁকে দেখানো হলো
+            draw(); 
             
             if (gameLoop) clearInterval(gameLoop);
-            // গেম লুপ এখানে শুরু হবে না, তা changeDirection ফাংশনে শুরু হবে
         }
 
         async function sendScoreToServer(finalScore) {
@@ -588,15 +618,21 @@
         setupControls();
         restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
         
-        // --- "Watch Ad to Continue" লজিক এবং Adsterra কোড বসানোর স্থান ---
+        // --- "Watch Ad to Continue" লজিক (Smartlink ব্যবহার করে) ---
         reviveAdBtn.addEventListener('click', () => {
-            // =========================================================================================
-            // আপনার Adsterra Rewarded Ad দেখানোর কোডটি এখানে (এই কমেন্ট সরিয়ে) বসান।
-            // অ্যাড সফলভাবে শেষ হওয়ার পর Adsterra-এর কলব্যাক ফাংশনে `reviveGame();` কল করতে হবে।
-            // =========================================================================================
-            
-            // ডেমো হিসেবে আমরা সরাসরি রিভাইভ ফাংশন কল করছি
-            reviveGame(); 
+            // ১. একটি নতুন ট্যাব খুলে Smartlink অ্যাড লোড করা হলো
+            window.open(SMARTLINK_URL, '_blank');
+
+            // ২. বাটনকে ডিসেবল করা হলো এবং ইউজারকে অপেক্ষা করার মেসেজ দেওয়া হলো
+            reviveAdBtn.innerText = 'WAIT (5s)';
+            reviveAdBtn.disabled = true;
+
+            // ৩. ৫ সেকেন্ড অপেক্ষা করার পর গেম রিভাইভ করা হবে
+            setTimeout(() => {
+                reviveGame();
+                reviveAdBtn.innerText = 'Watch Ad to Continue';
+                reviveAdBtn.disabled = false;
+            }, 5000); // 5000 milliseconds = 5 seconds
         });
         
         // Initial setup for scroll
