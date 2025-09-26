@@ -68,10 +68,10 @@
         }
         /* Game Over Buttons specific styling */
         .game-over-overlay .btn-lg {
-            width: 100%; /* বাটনগুলো তাদের কন্টেইনারের পুরো প্রস্থ নেবে */
-            max-width: 250px; /* ক্যানভাসের max-width (300px) এর চেয়ে ছোট রাখা হলো */
-            padding: 0.8rem 1.5rem; /* প্যাডিং সামান্য কমানো হলো */
-            font-size: 1.1rem; /* ফন্ট সাইজ সামান্য কমানো হলো */
+            width: 100%; 
+            max-width: 250px; 
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
             font-weight: bold;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -339,7 +339,7 @@
         const canvas = document.getElementById('game-board');
         const context = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
-        const gameOverOverlay = document.getElementById('game-over-overlay'); // নতুন ওভারলে
+        const gameOverOverlay = document.getElementById('game-over-overlay'); 
         const gameOverMessage = document.getElementById('game-over-message');
         const finalScoreDisplay = document.getElementById('final-score-display');
         const restartBtn = document.getElementById('restart-btn');
@@ -397,7 +397,6 @@
             });
         }
 
-        // ক্যানভাসের উপরে Game Over মেসেজ দেখানো এবং বাটন ডিসপ্লে করা
         function showGameOver() {
             finalScoreDisplay.innerText = `Score: ${score}`;
             gameOverOverlay.classList.remove('hidden');
@@ -480,11 +479,18 @@
                 }
             }, false);
 
-            // Control Button Touch Events
+            // Control Button Touch/Click Events (Mouse Click added here)
             document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
+            document.getElementById('up-btn').addEventListener('click', () => { changeDirection(0, -1); });
+
             document.getElementById('down-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, 1); });
+            document.getElementById('down-btn').addEventListener('click', () => { changeDirection(0, 1); });
+            
             document.getElementById('left-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(-1, 0); });
+            document.getElementById('left-btn').addEventListener('click', () => { changeDirection(-1, 0); });
+            
             document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(1, 0); });
+            document.getElementById('right-btn').addEventListener('click', () => { changeDirection(1, 0); });
         }
         
         function startGame(speed) {
@@ -492,7 +498,7 @@
 
             gameStartScreen.classList.add('hidden'); 
             gameArea.classList.remove('hidden');
-            gameOverOverlay.classList.add('hidden'); // নতুন: ওভারলে লুকানো
+            gameOverOverlay.classList.add('hidden');
             
             resizeCanvas(); 
             snake = [{ x: 10, y: 10 }];
@@ -504,8 +510,6 @@
             
             if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, gameSpeed); 
-            
-            // গেম শুরু হলেও স্ক্রল ON থাকবে।
         }
 
         async function sendScoreToServer(finalScore) {
