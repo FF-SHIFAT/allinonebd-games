@@ -307,7 +307,7 @@
                     'params' : {}
                 };
             </script>
-            <script type="text/javascript" src="//www.highperformanceformat.com/0b2ef9cfd621437503e7b94668e07929/invoke.js"></script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/0b2ef9cfd6211437503e7b94668e07929/invoke.js"></script>
         </div>
     </div>
 
@@ -655,9 +655,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadScoreData();
             setupControls();
-            setBodyScroll(true);
+            setBodyScroll(true); // FIX: Ensure initial scroll state is correct
 
-            // FIX: Game Selection Click Handler (Classic Snake)
+            // Scroll Toggle FIX: Reinstating the correct toggle logic
+            scrollToggleBtn.addEventListener('click', () => {
+                const isCurrentlyScrollable = scrollToggleBtn.innerText === 'ON';
+                setBodyScroll(!isCurrentlyScrollable);
+            });
+
+            // Game Selection Click Handler
             selectSnakeGameBtn.addEventListener('click', () => {
                 gameSelectionScreen.classList.add('hidden');
                 gameStartScreen.classList.remove('hidden');
