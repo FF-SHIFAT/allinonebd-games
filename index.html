@@ -317,7 +317,7 @@
         let lastSnakeState = [];
         let lastDirection = { x: 0, y: 0 };
         let lastScore = 0;
-        const REVIVE_TIME = 20; // 20 seconds as requested
+        const REVIVE_TIME = 20; // 20 seconds
         const SMARTLINK_URL = 'https://www.revenuecpmgate.com/ahzyb351n?key=6286b11048d4571f3a9cfd23abd5158b';
 
         // --- Local Storage Management ---
@@ -413,7 +413,11 @@
             }
         }
 
-        // --- Game Setup and Core Logic (Minimal Change) ---
+        // --- Game Setup and Core Logic ---
+        const TILE_SIZE = 16;
+        const BOARD_SIZE = 20;
+        let snake, food, direction, score, gameOver, gameLoop;
+
         const canvas = document.getElementById('game-board');
         const context = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
@@ -422,9 +426,83 @@
         const restartBtn = document.getElementById('restart-btn');
         const reviveAdBtn = document.getElementById('revive-ad-btn');
         const highScoreBox = document.getElementById('high-score-box');
-
-        // ... [Drawing and Control setup functions remain the same] ...
         
+        // --- Game Logic Functions (unchanged from last working version) ---
+        // ... (resizeCanvas, placeFood, draw, update) ... 
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            const size = Math.min(container.clientWidth, container.clientHeight, 320); 
+            canvas.width = size;
+            canvas.height = size;
+            // TILE_SIZE is calculated here based on the canvas size and BOARD_SIZE
+            // Note: BOARD_SIZE is assumed to be 20 based on initial code (320/16=20)
+            // A dynamic TILE_SIZE calculation might be needed if canvas size changes.
+            // For now, let's keep it simple:
+            // TILE_SIZE = size / BOARD_SIZE; 
+        }
+
+        function placeFood() {
+            food = {
+                x: Math.floor(Math.random() * BOARD_SIZE),
+                y: Math.floor(Math.random() * BOARD_SIZE)
+            };
+            for (let segment of snake) {
+                if (segment.x === food.x && segment.y === food.y) {
+                    return placeFood();
+                }
+            }
+        }
+
+        function draw() {
+            context.fillStyle = '#f3f4f6';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = '#ef4444';
+            context.beginPath();
+            context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, 2 * Math.PI);
+            context.fill();
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    context.fillStyle = '#10b981';
+                    context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                } else {
+                    context.fillStyle = '#34d399';
+                    context.fillRect(segment.x * TILE_SIZE + 2, segment.y * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                }
+            });
+        }
+
+        function update() {
+            if (gameOver) return;
+            if (direction.x === 0 && direction.y === 0) return;
+
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
+                gameOver = true;
+                clearInterval(gameLoop);
+                showGameOver();
+                return;
+            }
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver = true;
+                    clearInterval(gameLoop);
+                    showGameOver();
+                    return;
+                }
+            }
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreEl.innerText = score;
+                placeFood();
+            } else {
+                snake.pop();
+            }
+            draw();
+        }
+        // --- End Game Logic Functions ---
+
+
         function showGameOver() {
             // Save score before displaying final message
             const isNewHighScore = saveScoreData(score);
@@ -476,17 +554,10 @@
             draw(); 
         }
 
-        // ... [update and changeDirection remain the same] ...
-        // Note: The changeDirection logic has been moved to the updated function block.
-
-
-        // --- New/Updated Functions ---
-
-        // Overriding the previous simpler changeDirection and setupControls
         function changeDirection(dx, dy) {
             if (snake.length > 1 && direction.x === -dx && direction.y === -dy) return;
             
-            // *** নতুন লজিক: যদি গেম থেমে থাকে, তবে প্রথম ইনপুট গেম শুরু করবে ***
+            // *** লজিক: যদি গেম থেমে থাকে, তবে প্রথম ইনপুট গেম শুরু করবে ***
             if (direction.x === 0 && direction.y === 0 && !gameOver) {
                 gameLoop = setInterval(update, selectedSpeed); 
             }
@@ -511,9 +582,6 @@
                 btn.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(dx, dy); });
                 // Click (Mouse)
                 btn.addEventListener('click', () => { changeDirection(dx, dy); });
-
-                // Add Arrow Icon to the button
-                // (Already done in HTML but ensuring logic consistency)
             });
 
             // Desktop Key Controls (copied for completeness)
@@ -559,11 +627,18 @@
 
         // --- Event Listeners and Initialization ---
         
+        // FIX: Reinstating the click handler for selecting the game (previously missing)
+        document.getElementById('select-snake-game').addEventListener('click', () => {
+            gameSelectionScreen.classList.add('hidden');
+            gameStartScreen.classList.remove('hidden');
+            setBodyScroll(true); 
+        });
+
         // Initializer
         setupControls();
         restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
         
-        // --- "Watch Ad to Continue" লজিক (Updated with 20s countdown) ---
+        // --- "Watch Ad to Continue" লজিক (Updated with 20s countdown display) ---
         reviveAdBtn.addEventListener('click', () => {
             const totalTime = REVIVE_TIME;
             let timeLeft = totalTime;
@@ -577,6 +652,7 @@
 
             const countdownInterval = setInterval(() => {
                 timeLeft--;
+                // কাউন্টডাউন শো করা হলো
                 reviveAdBtn.innerText = `WAIT (${timeLeft}s)`;
 
                 if (timeLeft <= 0) {
