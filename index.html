@@ -59,36 +59,44 @@
         .game-list-item:hover {
             transform: translateY(-5px);
         }
+        /* কন্ট্রোল বাটনের স্পেস এবং আকারের জন্য নতুন স্টাইল */
         #controls {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: 1fr 1fr 1fr; /* 3 কলাম গ্রিড বজায় রাখা হলো */
+            gap: 15px; /* গ্যাপ বাড়ানো হলো */
             width: 100%;
-            max-width: 200px;
-            margin: 1.5rem auto 0;
+            max-width: 250px; /* কন্ট্রোল কন্টেইনারের সর্বোচ্চ প্রস্থ বাড়ানো হলো */
+            margin: 2rem auto 0; /* উপর থেকে মার্জিন বাড়ানো হলো */
         }
         .ctrl-btn {
             background-color: #4a5568;
             color: white;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 70px; /* বাটনের আকার বাড়ানো হলো */
+            height: 70px; /* বাটনের আকার বাড়ানো হলো */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 2rem; /* আইকনের আকার বাড়ানো হলো */
             cursor: pointer;
             user-select: none;
-            box-shadow: 0 4px #2d3748;
+            box-shadow: 0 5px #2d3748; /* ছায়ার আকার বাড়ানো হলো */
         }
         .ctrl-btn:active {
             transform: translateY(2px);
-            box-shadow: 0 2px #2d3748;
+            box-shadow: 0 3px #2d3748;
         }
-        #up-btn { grid-column: 2 / 3; }
+        #up-btn { 
+            grid-column: 2 / 3; 
+            margin-bottom: 5px; /* উপরের বাটনের নিচে স্পেস বাড়ানো হলো */
+        }
         #left-btn { grid-column: 1 / 2; grid-row: 2 / 3; }
         #right-btn { grid-column: 3 / 4; grid-row: 2 / 3; }
-        #down-btn { grid-column: 2 / 3; grid-row: 3 / 4; }
+        #down-btn { 
+            grid-column: 2 / 3; 
+            grid-row: 3 / 4; 
+            margin-top: 5px; /* নিচের বাটনের উপরে স্পেস বাড়ানো হলো */
+        }
         /* রেসপনসিভ বাটন ফিক্স */
         .responsive-buttons {
             display: grid;
@@ -100,7 +108,7 @@
                 grid-template-columns: repeat(4, 1fr);
             }
         }
-        /* নতুন স্টাইল: ডিফিকাল্টি বাটন */
+        /* ডিফিকাল্টি বাটন */
         .difficulty-btn {
             padding: 1rem;
             border-radius: 0.5rem;
@@ -177,9 +185,9 @@
             <div id="game-area" class="hidden text-center">
                 <div class="flex justify-between items-center mb-4 px-2">
                     <button id="back-to-list-btn" class="text-sm bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300">← Game List</button>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs text-gray-600 hidden sm:inline">Screen Scroll:</span>
-                        <button id="scroll-toggle-btn" class="bg-gray-400 text-white text-xs px-2 py-1 rounded-full w-12 transition-colors duration-200">OFF</button>
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs font-semibold text-gray-700 mb-1">Scroll Lock</span>
+                        <button id="scroll-toggle-btn" class="bg-gray-400 text-white text-sm px-3 py-1 rounded-full w-16 transition-colors duration-200">OFF</button>
                     </div>
                     <div class="text-lg font-bold bg-gray-800 text-white px-4 py-2 rounded-md">SCORE: <span id="score">0</span></div>
                 </div>
@@ -212,12 +220,14 @@
             const body = document.body;
             const scrollToggleBtn = document.getElementById('scroll-toggle-btn');
             if (isScrollable) {
+                // স্ক্রল করার অনুমতি
                 body.style.overflowY = 'auto';
                 body.style.touchAction = 'pan-y';
                 scrollToggleBtn.innerText = 'ON';
                 scrollToggleBtn.classList.remove('bg-gray-400');
                 scrollToggleBtn.classList.add('bg-green-500');
             } else {
+                // স্ক্রল বন্ধ
                 body.style.overflowY = 'hidden';
                 body.style.touchAction = 'none';
                 scrollToggleBtn.innerText = 'OFF';
@@ -228,27 +238,23 @@
 
         // --- Game Selection & Start Screen ---
         const gameSelectionScreen = document.getElementById('game-selection-screen');
-        const gameStartScreen = document.getElementById('game-start-screen'); // নতুন স্ক্রিন
+        const gameStartScreen = document.getElementById('game-start-screen');
         const gameArea = document.getElementById('game-area');
         const selectSnakeGameBtn = document.getElementById('select-snake-game');
         const scrollToggleBtn = document.getElementById('scroll-toggle-btn');
         const backToSelectionBtn = document.getElementById('back-to-selection-btn');
         
-        // গেম নির্বাচন -> ডিফিকাল্টি স্ক্রিনে যাওয়া
         selectSnakeGameBtn.addEventListener('click', () => {
             gameSelectionScreen.classList.add('hidden');
             gameStartScreen.classList.remove('hidden');
-            // ডিফিকাল্টি স্ক্রিনে স্ক্রল চালু থাকুক
             setBodyScroll(true); 
         });
 
-        // ডিফিকাল্টি স্ক্রিন থেকে গেম লিস্টে ফেরা
         backToSelectionBtn.addEventListener('click', () => {
             gameStartScreen.classList.add('hidden');
             gameSelectionScreen.classList.remove('hidden');
         });
 
-        // গেম এরিয়া থেকে গেম লিস্টে ফেরা
         document.getElementById('back-to-list-btn').addEventListener('click', () => {
             if (gameLoop) clearInterval(gameLoop);
             gameArea.classList.add('hidden');
@@ -256,13 +262,11 @@
             setBodyScroll(true); 
         });
 
-        // স্ক্রল টগল বাটন লজিক
         scrollToggleBtn.addEventListener('click', () => {
             const isScrollable = scrollToggleBtn.innerText === 'OFF';
             setBodyScroll(isScrollable);
         });
         
-        // ডিফিকাল্টি বাটন লজিক
         document.getElementById('easy-mode-btn').addEventListener('click', () => {
             const speed = parseInt(document.getElementById('easy-mode-btn').dataset.speed);
             startGame(speed);
@@ -277,7 +281,7 @@
         });
 
 
-        // --- Snake Game Logic ---
+        // --- Snake Game Logic (No Change Here) ---
         const canvas = document.getElementById('game-board');
         const context = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
@@ -292,12 +296,9 @@
         function resizeCanvas() {
             const container = document.getElementById('canvas-container');
             const size = Math.min(container.clientWidth, container.clientHeight, 320); 
-            
             canvas.width = size;
             canvas.height = size;
-            
             TILE_SIZE = size / BOARD_SIZE;
-
             if (gameLoop) {
                 draw();
             }
@@ -324,18 +325,16 @@
         function draw() {
             context.fillStyle = '#f3f4f6';
             context.fillRect(0, 0, canvas.width, canvas.height);
-            
-            context.fillStyle = '#ef4444'; // Red food
+            context.fillStyle = '#ef4444';
             context.beginPath();
             context.arc(food.x * TILE_SIZE + TILE_SIZE / 2, food.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, 2 * Math.PI);
             context.fill();
-
             snake.forEach((segment, index) => {
-                if (index === 0) { // Head
-                    context.fillStyle = '#10b981'; // Bright green head
+                if (index === 0) {
+                    context.fillStyle = '#10b981';
                     context.fillRect(segment.x * TILE_SIZE, segment.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                } else { // Body
-                    context.fillStyle = '#34d399'; // Lighter green body
+                } else {
+                    context.fillStyle = '#34d399';
                     context.fillRect(segment.x * TILE_SIZE + 2, segment.y * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
                 }
             });
@@ -344,24 +343,19 @@
         function showGameOver() {
             context.fillStyle = 'rgba(255, 255, 255, 0.7)';
             context.fillRect(0, 0, canvas.width, canvas.height);
-            
             context.fillStyle = '#1f2937';
             context.font = 'bold ' + (canvas.height * 0.1125) + 'px Inter, sans-serif';
             context.textAlign = 'center';
             context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - (canvas.height * 0.0625));
-            
             context.font = (canvas.height * 0.075) + 'px Inter, sans-serif';
             context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + (canvas.height * 0.0625));
-
             gameOverButtons.classList.remove('hidden');
             setBodyScroll(true); 
         }
 
         function update() {
             if (gameOver) return;
-
             const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            
             if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
                 gameOver = true;
                 clearInterval(gameLoop);
@@ -369,7 +363,6 @@
                 sendScoreToServer(score);
                 return;
             }
-            
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     gameOver = true;
@@ -379,9 +372,7 @@
                     return;
                 }
             }
-
             snake.unshift(head);
-
             if (head.x === food.x && head.y === food.y) {
                 score++;
                 scoreEl.innerText = score;
@@ -445,9 +436,7 @@
             document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(1, 0); });
         }
         
-        // startGame ফাংশনটি এখন একটি 'speed' প্যারামিটার নেয়
-        function startGame(speed = 120) { // Default speed 120 (Medium)
-            // ডিফিকাল্টি স্ক্রিন লুকিয়ে গেম এরিয়া দেখানো হলো
+        function startGame(speed = 120) {
             gameStartScreen.classList.add('hidden'); 
             gameArea.classList.remove('hidden');
             
@@ -461,10 +450,8 @@
             placeFood();
             
             if (gameLoop) clearInterval(gameLoop);
-            // নির্বাচিত গতি ব্যবহার করে গেম লুপ শুরু করা হলো
             gameLoop = setInterval(update, speed); 
             
-            // গেম শুরু হলে স্ক্রল অফ
             setBodyScroll(false); 
         }
 
