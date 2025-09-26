@@ -66,6 +66,23 @@
             justify-content: center;
             z-index: 10;
         }
+        /* Game Over Buttons specific styling */
+        .game-over-overlay .btn-lg {
+            width: 100%; /* বাটনগুলো তাদের কন্টেইনারের পুরো প্রস্থ নেবে */
+            max-width: 250px; /* ক্যানভাসের max-width (300px) এর চেয়ে ছোট রাখা হলো */
+            padding: 0.8rem 1.5rem; /* প্যাডিং সামান্য কমানো হলো */
+            font-size: 1.1rem; /* ফন্ট সাইজ সামান্য কমানো হলো */
+            font-weight: bold;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .game-over-overlay .btn-lg:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+
         .game-list-item {
             cursor: pointer;
             transition: transform 0.2s;
@@ -227,8 +244,8 @@
                             <h3 id="game-over-message" class="text-3xl font-bold text-gray-800 mb-2">Game Over</h3>
                             <p id="final-score-display" class="text-2xl text-gray-600 mb-6">Score: 0</p>
                             <div class="w-full max-w-xs mx-auto space-y-3">
-                                <button id="restart-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
-                                <button id="revive-ad-btn" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
+                                <button id="restart-btn" class="btn-lg bg-blue-600 text-white">Play Again</button>
+                                <button id="revive-ad-btn" class="btn-lg bg-green-600 text-white">Watch Ad to Continue</button>
                             </div>
                         </div>
                     </div>
@@ -239,7 +256,7 @@
                     <div id="right-btn" class="ctrl-btn"><i class="ph-arrow-right-bold"></i></div>
                     <div id="down-btn" class="ctrl-btn"><i class="ph-arrow-down-bold"></i></div>
                 </div>
-                 </div>
+            </div>
         </div>
 
         <div class="ad-placeholder h-24 mt-4">
@@ -384,7 +401,6 @@
         function showGameOver() {
             finalScoreDisplay.innerText = `Score: ${score}`;
             gameOverOverlay.classList.remove('hidden');
-            // গেম ওভার হলেও স্ক্রল ON থাকবে
             setBodyScroll(true); 
         }
 
@@ -472,7 +488,6 @@
         }
         
         function startGame(speed) {
-            // গেমের নির্বাচিত গতি না থাকলে ডিফল্ট Medium (120) ব্যবহার করা
             const gameSpeed = speed || selectedSpeed; 
 
             gameStartScreen.classList.add('hidden'); 
@@ -488,7 +503,6 @@
             placeFood();
             
             if (gameLoop) clearInterval(gameLoop);
-            // নির্বাচিত গতিতে গেম লুপ শুরু
             gameLoop = setInterval(update, gameSpeed); 
             
             // গেম শুরু হলেও স্ক্রল ON থাকবে।
@@ -500,7 +514,6 @@
 
         // Initialize Controls
         setupControls();
-        // Play Again/Restart বাটনে গ্লোবাল ভেরিয়েবলের গতি ব্যবহার করা
         restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
         reviveAdBtn.addEventListener('click', () => {
             alert('Rewarded Ad feature will be added in the next step!');
