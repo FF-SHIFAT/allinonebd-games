@@ -42,7 +42,6 @@
             font-weight: 500;
             min-height: 50px;
         }
-        /* এখানে Adsterra কোড যোগ করলে, এই ক্লাসটি অ্যাডজাস্ট করে দিন যাতে অ্যাড সঠিকভাবে দেখায় */
         .ad-content {
             width: 100%;
             height: 100%;
@@ -420,42 +419,52 @@
             lastScore = score;
         }
         
-        // --- নতুন রিভাইভ ফাংশন ---
+        // --- রিভাইভ ফাংশন (আপডেট করা হয়েছে) ---
         function reviveGame() {
             gameOver = false;
             gameOverOverlay.classList.add('hidden');
             score = lastScore;
             scoreEl.innerText = score;
             
-            // সাপকে তার শেষ অবস্থান থেকে এক টাইল পেছনে সরানো যাতে সে সাথে সাথেই আবার collide না করে
+            // সাপকে তার শেষ অবস্থান থেকে এক টাইল পেছনে সরানো হলো
             const lastHead = lastSnakeState[0];
             const safeHead = { 
                 x: lastHead.x - lastDirection.x, 
                 y: lastHead.y - lastDirection.y 
             };
-
-            // যদি সাপের শেষ অবস্থান ক্যানভাসের বাইরে থাকে, তবে তাকে ক্যানভাসের মধ্যে রাখতে হবে
-            if (safeHead.x < 0 || safeHead.x >= BOARD_SIZE || safeHead.y < 0 || safeHead.y >= BOARD_SIZE) {
-                // একদম নতুন গেম শুরু করার মতো কাছাকাছি কিছু করা হলো, তবে বর্তমান স্কোর ঠিক রাখা হলো
-                snake = [{ x: Math.floor(BOARD_SIZE / 2), y: Math.floor(BOARD_SIZE / 2) }];
-                direction = { x: 0, y: -1 }; // উপর দিকে মুখ করে শুরু করা হলো
-            } else {
+            
+            // যদি সেফ পজিশন বোর্ডের ভেতরে থাকে, তাহলে সাপকে সেখানে বসানো হলো
+            if (safeHead.x >= 0 && safeHead.x < BOARD_SIZE && safeHead.y >= 0 && safeHead.y < BOARD_SIZE) {
                 snake = [safeHead, ...lastSnakeState.slice(0, -1)]; // নতুন মাথা যোগ করে লেজ থেকে একটি সরালাম
-                direction = lastDirection;
+            } else {
+                // যদি সেফ পজিশন বোর্ডের বাইরে যায় (যেমন দেওয়ালের ঠিক বাইরে), তবে মাথাকে দেওয়ালের কাছাকাছি আনা হলো
+                snake = [{ ...lastHead }, ...lastSnakeState.slice(1)];
             }
             
-            // নতুন ফুড বসানো হলো, যদি শেষ ফুড না খাওয়া হয়ে থাকে
-            placeFood();
-            
-            // গেমটিকে নির্বাচিত গতিতে আবার শুরু করা হলো
+            // গেম লুপ বন্ধ করা হলো
             if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, selectedSpeed); 
+            
+            // দিকনির্দেশনা শূন্য করা হলো, যাতে ইউজার ইনপুটের জন্য অপেক্ষা করে
+            direction = { x: 0, y: 0 }; 
+            
+            // ফুড বসানো
+            placeFood();
+            draw(); // একবার ড্র করে সাপকে দেখানো হলো
+            
+            // এখানে গেম লুপ শুরু করা হবে না, তা ইউজার ইনপুটের জন্য অপেক্ষা করবে
+            // গেম লুপ শুরু হবে changeDirection ফাংশনে 
         }
         // --- রিভাইভ ফাংশন শেষ ---
 
 
         function update() {
             if (gameOver) return;
+
+            // যদি direction {x:0, y:0} হয়, তবে সাপ স্থির থাকবে এবং এই ফাংশনটি চলবে না
+            if (direction.x === 0 && direction.y === 0) {
+                return;
+            }
+
             const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
             if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
                 gameOver = true;
@@ -486,6 +495,13 @@
         
         function changeDirection(dx, dy) {
             if (snake.length > 1 && direction.x === -dx && direction.y === -dy) return;
+            
+            // *** নতুন লজিক: যদি গেম থেমে থাকে, তবে প্রথম ইনপুট গেম শুরু করবে ***
+            if (direction.x === 0 && direction.y === 0 && !gameOver) {
+                // গেম লুপ শুরু করা হলো
+                gameLoop = setInterval(update, selectedSpeed); 
+            }
+            
             direction = { x: dx, y: dy };
         }
 
@@ -530,7 +546,7 @@
                 }
             }, false);
 
-            // Control Button Touch/Click Events
+            // Control Button Touch/Click Events (Mouse Click and Touch Start both call changeDirection)
             document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
             document.getElementById('up-btn').addEventListener('click', () => { changeDirection(0, -1); });
 
@@ -553,14 +569,15 @@
             
             resizeCanvas(); 
             snake = [{ x: 10, y: 10 }];
-            direction = { x: 0, y: 0 };
+            direction = { x: 0, y: 0 }; // গেম শুরু হলেই থেমে থাকবে
             score = 0;
             gameOver = false;
             scoreEl.innerText = score;
             placeFood();
+            draw(); // সাপকে শুরুতে এঁকে দেখানো হলো
             
             if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, gameSpeed); 
+            // গেম লুপ এখানে শুরু হবে না, তা changeDirection ফাংশনে শুরু হবে
         }
 
         async function sendScoreToServer(finalScore) {
@@ -571,13 +588,12 @@
         setupControls();
         restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
         
-        // --- "Watch Ad to Continue" লজিক ---
+        // --- "Watch Ad to Continue" লজিক এবং Adsterra কোড বসানোর স্থান ---
         reviveAdBtn.addEventListener('click', () => {
-            // ১. অ্যাড দেখার ফাংশনটি কল করা হবে (Adsterra/Adsense/অন্য কোনো অ্যাড নেটওয়ার্ক এর ক্ষেত্রে এই কোড বসাতে হবে)
-            // alert('Simulating Rewarded Ad...');
-            
-            // ২. অ্যাড সফল হলে গেম রিভাইভ করা হবে
-            // (সাধারণত রিয়েল অ্যাড নেটওয়ার্কে একটি কলব্যাক ফাংশন থাকে যা অ্যাড সফলভাবে শেষ হলে এই reviveGame() কে কল করে)
+            // =========================================================================================
+            // আপনার Adsterra Rewarded Ad দেখানোর কোডটি এখানে (এই কমেন্ট সরিয়ে) বসান।
+            // অ্যাড সফলভাবে শেষ হওয়ার পর Adsterra-এর কলব্যাক ফাংশনে `reviveGame();` কল করতে হবে।
+            // =========================================================================================
             
             // ডেমো হিসেবে আমরা সরাসরি রিভাইভ ফাংশন কল করছি
             reviveGame(); 
