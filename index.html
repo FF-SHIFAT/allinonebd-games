@@ -52,6 +52,20 @@
             height: 100%;
             touch-action: none;
         }
+        /* Game Over Overlay Style */
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
         .game-list-item {
             cursor: pointer;
             transition: transform 0.2s;
@@ -84,22 +98,20 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        /* নতুন কন্ট্রোল বাটন ডিজাইন এবং স্পেসিং */
+        /* কন্ট্রোল বাটন ডিজাইন এবং স্পেসিং */
         #controls {
             display: grid;
-            /* 1fr 1fr 1fr: প্রস্থ ৩ ভাগে ভাগ হলো */
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 5px; /* ছোট গ্যাপ, কারণ বাটনগুলো নিজেরাই বড় */
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
             width: 100%;
-            max-width: 300px; /* কন্টেইনারের সর্বোচ্চ প্রস্থ আরো বাড়ানো হলো */
+            max-width: 300px;
             margin: 2rem auto 0;
         }
         .ctrl-btn {
-            background-color: #4a5568;
             color: white;
-            border-radius: 0.5rem; /* চৌকো আকার */
-            width: 90%; /* গ্রিডের মধ্যে স্পেস নেবে */
-            min-height: 60px; 
+            border-radius: 0.5rem;
+            width: 90%;
+            min-height: 60px;
             height: auto;
             padding: 10px 0;
             display: flex;
@@ -108,46 +120,36 @@
             font-size: 2.2rem;
             cursor: pointer;
             user-select: none;
-            box-shadow: 0 4px #2d3748;
             transition: transform 0.1s;
         }
-        /* বাটন কালার ও পজিশন আপডেট করা হলো */
         #up-btn { 
             grid-column: 2 / 3; 
-            background-color: #34d399; /* Green tone */
+            background-color: #34d399;
             box-shadow: 0 4px #10b981;
         }
         #left-btn { 
             grid-column: 1 / 2; 
             grid-row: 2 / 3;
-            background-color: #60a5fa; /* Blue tone */
+            background-color: #60a5fa;
             box-shadow: 0 4px #3b82f6;
         }
         #right-btn { 
             grid-column: 3 / 4; 
             grid-row: 2 / 3;
-            background-color: #60a5fa; /* Blue tone */
+            background-color: #60a5fa;
             box-shadow: 0 4px #3b82f6;
         }
         #down-btn { 
             grid-column: 2 / 3; 
             grid-row: 3 / 4; 
-            background-color: #34d399; /* Green tone */
+            background-color: #34d399;
             box-shadow: 0 4px #10b981;
         }
-
         .ctrl-btn:active {
             transform: translateY(2px);
-            box-shadow: 0 2px #2d3748;
+            box-shadow: 0 2px var(--shadow-color); /* এটি জাভাস্ক্রিপ্টে সেট করা হবে */
         }
 
-        /* বাম-ডান বাটনের জন্য গ্রিড লেআউট ফিক্স */
-        #controls > div:nth-child(2) { 
-            grid-row: 2 / 3; 
-        }
-        #controls > div:nth-child(3) { 
-            grid-row: 2 / 3; 
-        }
     </style>
 </head>
 <body class="p-2 md:p-4">
@@ -214,13 +216,21 @@
                     <button id="back-to-list-btn" class="text-sm bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300">← Game List</button>
                     <div class="flex flex-col items-center">
                         <span class="text-xs font-semibold text-gray-700 mb-1">Scroll Lock</span>
-                        <button id="scroll-toggle-btn" class="bg-green-500 text-white text-sm px-3 py-1 rounded-full w-16 transition-colors duration-200">ON</button>
+                        <button id="scroll-toggle-btn" class="text-white text-sm px-3 py-1 rounded-full w-16 transition-colors duration-200">ON</button>
                     </div>
                     <div class="text-lg font-bold bg-gray-800 text-white px-4 py-2 rounded-md">SCORE: <span id="score">0</span></div>
                 </div>
                 <div class="flex justify-center">
                     <div id="canvas-container" class="relative w-full max-w-xs aspect-square mx-auto">
                         <canvas id="game-board" width="320" height="320"></canvas>
+                        <div id="game-over-overlay" class="game-over-overlay hidden">
+                            <h3 id="game-over-message" class="text-3xl font-bold text-gray-800 mb-2">Game Over</h3>
+                            <p id="final-score-display" class="text-2xl text-gray-600 mb-6">Score: 0</p>
+                            <div class="w-full max-w-xs mx-auto space-y-3">
+                                <button id="restart-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
+                                <button id="revive-ad-btn" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="controls">
@@ -229,11 +239,7 @@
                     <div id="right-btn" class="ctrl-btn"><i class="ph-arrow-right-bold"></i></div>
                     <div id="down-btn" class="ctrl-btn"><i class="ph-arrow-down-bold"></i></div>
                 </div>
-                 <div id="game-over-buttons" class="hidden mt-6 space-y-3">
-                    <button id="restart-btn" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Play Again</button>
-                    <button id="revive-ad-btn" class="w-full max-w-xs mx-auto bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Watch Ad to Continue</button>
-                </div>
-            </div>
+                 </div>
         </div>
 
         <div class="ad-placeholder h-24 mt-4">
@@ -242,6 +248,9 @@
     </div>
 
     <script>
+        // গেমের নির্বাচিত গতি সংরক্ষণ করার জন্য একটি গ্লোবাল ভেরিয়েবল
+        let selectedSpeed = 120; // Default to Medium
+
         // --- Utility Functions ---
         function setBodyScroll(isScrollable) {
             const body = document.body;
@@ -274,7 +283,6 @@
         selectSnakeGameBtn.addEventListener('click', () => {
             gameSelectionScreen.classList.add('hidden');
             gameStartScreen.classList.remove('hidden');
-            // ডিফিকাল্টি স্ক্রিনে স্ক্রল চালু থাকুক
             setBodyScroll(true); 
         });
 
@@ -295,26 +303,30 @@
             setBodyScroll(isScrollable);
         });
         
-        document.getElementById('easy-mode-btn').addEventListener('click', () => {
-            const speed = parseInt(document.getElementById('easy-mode-btn').dataset.speed);
-            startGame(speed);
+        // ডিফিকাল্টি বাটন লজিক: নির্বাচিত গতি গ্লোবাল ভেরিয়েবলে সংরক্ষণ করা
+        document.getElementById('easy-mode-btn').addEventListener('click', (e) => {
+            selectedSpeed = parseInt(e.currentTarget.dataset.speed);
+            startGame(selectedSpeed);
         });
-        document.getElementById('medium-mode-btn').addEventListener('click', () => {
-            const speed = parseInt(document.getElementById('medium-mode-btn').dataset.speed);
-            startGame(speed);
+        document.getElementById('medium-mode-btn').addEventListener('click', (e) => {
+            selectedSpeed = parseInt(e.currentTarget.dataset.speed);
+            startGame(selectedSpeed);
         });
-        document.getElementById('hard-mode-btn').addEventListener('click', () => {
-            const speed = parseInt(document.getElementById('hard-mode-btn').dataset.speed);
-            startGame(speed);
+        document.getElementById('hard-mode-btn').addEventListener('click', (e) => {
+            selectedSpeed = parseInt(e.currentTarget.dataset.speed);
+            startGame(selectedSpeed);
         });
 
 
-        // --- Snake Game Logic (No Change Here) ---
+        // --- Snake Game Logic ---
         const canvas = document.getElementById('game-board');
         const context = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
-        const gameOverButtons = document.getElementById('game-over-buttons');
+        const gameOverOverlay = document.getElementById('game-over-overlay'); // নতুন ওভারলে
+        const gameOverMessage = document.getElementById('game-over-message');
+        const finalScoreDisplay = document.getElementById('final-score-display');
         const restartBtn = document.getElementById('restart-btn');
+        const reviveAdBtn = document.getElementById('revive-ad-btn');
         
         let TILE_SIZE = 16;
         let BOARD_SIZE = 20;
@@ -368,16 +380,11 @@
             });
         }
 
+        // ক্যানভাসের উপরে Game Over মেসেজ দেখানো এবং বাটন ডিসপ্লে করা
         function showGameOver() {
-            context.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            context.fillStyle = '#1f2937';
-            context.font = 'bold ' + (canvas.height * 0.1125) + 'px Inter, sans-serif';
-            context.textAlign = 'center';
-            context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - (canvas.height * 0.0625));
-            context.font = (canvas.height * 0.075) + 'px Inter, sans-serif';
-            context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + (canvas.height * 0.0625));
-            gameOverButtons.classList.remove('hidden');
+            finalScoreDisplay.innerText = `Score: ${score}`;
+            gameOverOverlay.classList.remove('hidden');
+            // গেম ওভার হলেও স্ক্রল ON থাকবে
             setBodyScroll(true); 
         }
 
@@ -464,9 +471,13 @@
             document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(1, 0); });
         }
         
-        function startGame(speed = 120) {
+        function startGame(speed) {
+            // গেমের নির্বাচিত গতি না থাকলে ডিফল্ট Medium (120) ব্যবহার করা
+            const gameSpeed = speed || selectedSpeed; 
+
             gameStartScreen.classList.add('hidden'); 
             gameArea.classList.remove('hidden');
+            gameOverOverlay.classList.add('hidden'); // নতুন: ওভারলে লুকানো
             
             resizeCanvas(); 
             snake = [{ x: 10, y: 10 }];
@@ -474,14 +485,13 @@
             score = 0;
             gameOver = false;
             scoreEl.innerText = score;
-            gameOverButtons.classList.add('hidden');
             placeFood();
             
             if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, speed); 
+            // নির্বাচিত গতিতে গেম লুপ শুরু
+            gameLoop = setInterval(update, gameSpeed); 
             
-            // নতুন লজিক: গেম শুরু হলেও স্ক্রল ডিফল্ট ON
-            // setBodyScroll(false); এই লাইনটি আর ব্যবহার হচ্ছে না 
+            // গেম শুরু হলেও স্ক্রল ON থাকবে।
         }
 
         async function sendScoreToServer(finalScore) {
@@ -490,13 +500,14 @@
 
         // Initialize Controls
         setupControls();
-        restartBtn.addEventListener('click', () => startGame(120)); 
-        document.getElementById('revive-ad-btn').addEventListener('click', () => {
+        // Play Again/Restart বাটনে গ্লোবাল ভেরিয়েবলের গতি ব্যবহার করা
+        restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
+        reviveAdBtn.addEventListener('click', () => {
             alert('Rewarded Ad feature will be added in the next step!');
         });
         
         // Initial setup for scroll
-        setBodyScroll(true); // পেজ লোড হলেই স্ক্রল ON
+        setBodyScroll(true);
     </script>
 
 </body>
