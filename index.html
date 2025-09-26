@@ -42,6 +42,15 @@
             font-weight: 500;
             min-height: 50px;
         }
+        /* এখানে Adsterra কোড যোগ করলে, এই ক্লাসটি অ্যাডজাস্ট করে দিন যাতে অ্যাড সঠিকভাবে দেখায় */
+        .ad-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         #game-board {
             border: 5px solid #4a5568;
             background-color: #f3f4f6;
@@ -173,8 +182,7 @@
 
     <div class="game-container">
         <div class="ad-placeholder h-24 mb-4">
-            Place your Top Ad here (e.g., AdSense 728x90)
-        </div>
+            </div>
 
         <div class="responsive-buttons text-center mb-4">
             <a href="আপনার-ডিরেক্ট-লিঙ্ক-১" target="_blank" class="p-3 bg-green-500 text-white font-bold rounded-lg shadow-md">🎁 Claim Bonus</a>
@@ -260,13 +268,17 @@
         </div>
 
         <div class="ad-placeholder h-24 mt-4">
-            Place your Bottom Ad here (e.g., AdSense 728x90)
-        </div>
+            </div>
     </div>
 
     <script>
         // গেমের নির্বাচিত গতি সংরক্ষণ করার জন্য একটি গ্লোবাল ভেরিয়েবল
         let selectedSpeed = 120; // Default to Medium
+        
+        // রিভাইভ (Revive) লজিকের জন্য সাপের শেষ অবস্থা সংরক্ষণ করার জন্য ভেরিয়েবল
+        let lastSnakeState = [];
+        let lastDirection = { x: 0, y: 0 };
+        let lastScore = 0;
 
         // --- Utility Functions ---
         function setBodyScroll(isScrollable) {
@@ -401,7 +413,46 @@
             finalScoreDisplay.innerText = `Score: ${score}`;
             gameOverOverlay.classList.remove('hidden');
             setBodyScroll(true); 
+            
+            // রিভাইভের জন্য সাপের শেষ অবস্থান সংরক্ষণ
+            lastSnakeState = [...snake];
+            lastDirection = { ...direction };
+            lastScore = score;
         }
+        
+        // --- নতুন রিভাইভ ফাংশন ---
+        function reviveGame() {
+            gameOver = false;
+            gameOverOverlay.classList.add('hidden');
+            score = lastScore;
+            scoreEl.innerText = score;
+            
+            // সাপকে তার শেষ অবস্থান থেকে এক টাইল পেছনে সরানো যাতে সে সাথে সাথেই আবার collide না করে
+            const lastHead = lastSnakeState[0];
+            const safeHead = { 
+                x: lastHead.x - lastDirection.x, 
+                y: lastHead.y - lastDirection.y 
+            };
+
+            // যদি সাপের শেষ অবস্থান ক্যানভাসের বাইরে থাকে, তবে তাকে ক্যানভাসের মধ্যে রাখতে হবে
+            if (safeHead.x < 0 || safeHead.x >= BOARD_SIZE || safeHead.y < 0 || safeHead.y >= BOARD_SIZE) {
+                // একদম নতুন গেম শুরু করার মতো কাছাকাছি কিছু করা হলো, তবে বর্তমান স্কোর ঠিক রাখা হলো
+                snake = [{ x: Math.floor(BOARD_SIZE / 2), y: Math.floor(BOARD_SIZE / 2) }];
+                direction = { x: 0, y: -1 }; // উপর দিকে মুখ করে শুরু করা হলো
+            } else {
+                snake = [safeHead, ...lastSnakeState.slice(0, -1)]; // নতুন মাথা যোগ করে লেজ থেকে একটি সরালাম
+                direction = lastDirection;
+            }
+            
+            // নতুন ফুড বসানো হলো, যদি শেষ ফুড না খাওয়া হয়ে থাকে
+            placeFood();
+            
+            // গেমটিকে নির্বাচিত গতিতে আবার শুরু করা হলো
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, selectedSpeed); 
+        }
+        // --- রিভাইভ ফাংশন শেষ ---
+
 
         function update() {
             if (gameOver) return;
@@ -467,7 +518,7 @@
 
                 const SWIPE_THRESHOLD = 20; 
 
-                if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
+                if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > Math.abs(dx)) {
                     e.preventDefault(); 
                     if (Math.abs(dx) > Math.abs(dy)) {
                         if (dx > 0) changeDirection(1, 0); // Right
@@ -479,7 +530,7 @@
                 }
             }, false);
 
-            // Control Button Touch/Click Events (Mouse Click added here)
+            // Control Button Touch/Click Events
             document.getElementById('up-btn').addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection(0, -1); });
             document.getElementById('up-btn').addEventListener('click', () => { changeDirection(0, -1); });
 
@@ -519,8 +570,17 @@
         // Initialize Controls
         setupControls();
         restartBtn.addEventListener('click', () => startGame(selectedSpeed)); 
+        
+        // --- "Watch Ad to Continue" লজিক ---
         reviveAdBtn.addEventListener('click', () => {
-            alert('Rewarded Ad feature will be added in the next step!');
+            // ১. অ্যাড দেখার ফাংশনটি কল করা হবে (Adsterra/Adsense/অন্য কোনো অ্যাড নেটওয়ার্ক এর ক্ষেত্রে এই কোড বসাতে হবে)
+            // alert('Simulating Rewarded Ad...');
+            
+            // ২. অ্যাড সফল হলে গেম রিভাইভ করা হবে
+            // (সাধারণত রিয়েল অ্যাড নেটওয়ার্কে একটি কলব্যাক ফাংশন থাকে যা অ্যাড সফলভাবে শেষ হলে এই reviveGame() কে কল করে)
+            
+            // ডেমো হিসেবে আমরা সরাসরি রিভাইভ ফাংশন কল করছি
+            reviveGame(); 
         });
         
         // Initial setup for scroll
